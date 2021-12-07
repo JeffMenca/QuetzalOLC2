@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quetzal OLC2</title>
+</head>
+
+<body>
+    <h1>Calculadora con JISON</h1>
+    <input type="text" id="text" placeholder="Ingrese operacion">
+    <input type="button" value="Enter" onclick="parse()">
+    <h2 id="result"></h2>
+    <script>
+        function parse() {
+            let result = calculator.parse(document.getElementById("text").value);
+            document.getElementById("result").innerHTML = `El resultado es: ${result}`;
+        }
+    </script>
+    <script src="calculator.js"></script>
+</body>
+
+</html>
