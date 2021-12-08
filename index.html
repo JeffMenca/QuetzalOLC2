@@ -15,11 +15,11 @@
     <h2 id="result"></h2>
     <script>
         function parse() {
-            let result = calculator.parse(document.getElementById("text").value);
+            let result = grammar.parse(document.getElementById("text").value);
             document.getElementById("result").innerHTML = `El resultado es: ${result}`;
         }
     </script>
-    <script src="Gramatica/calculator.js"></script>
+    <script src="Gramatica/grammar.js"></script>
 </body>
 
 </html>
