@@ -82,11 +82,11 @@ BSL                                 "\\".
 
 /* IMPORTS  */
 %{
-    const {Print} = require("../Instrucciones/Primitivas/Print");
-    const {Primitivo} = require("../Expresiones/Primitivo");
-    const {Operacion, Operador} = require("../Expresiones/Operacion");
-    const {Objeto} = require("../Expresiones/Objeto");
-    const {Atributo} = require("../Expresiones/Atributo");
+    const {Print} = require("../Instrucciones/Primitivas/Print.js");
+    const {Primitivo} = require("../Expresiones/Primitivo.js");
+    const {Operacion, Operador} = require("../Expresiones/Operacion.js");
+    const {Objeto} = require("../Expresiones/Objeto.js");
+    const {Atributo} = require("../Expresiones/Atributo.js");
 %}
 
 /* PRECEDENCIA */
