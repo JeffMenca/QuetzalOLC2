@@ -3,7 +3,6 @@ import { Entorno } from "../../AST/Entorno";
 import { Expresion } from "../../Interfaces/Expresion";
 import { Instruccion } from "../../Interfaces/Instruccion";
 
-
 export class Print implements Instruccion{
     linea: number;
     columna: number;
@@ -26,6 +25,7 @@ export class Print implements Instruccion{
         }else{
             console.log('>> Error, no se pueden imprimir valores nulos');
         }
+        return valor;
     }
 
 }

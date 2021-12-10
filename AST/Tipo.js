@@ -2,7 +2,7 @@
 exports.__esModule = true;
 exports.Tipo = void 0;
 var Tipo;
-(function(Tipo) {
+(function (Tipo) {
     Tipo[Tipo["STRING"] = 0] = "STRING";
     Tipo[Tipo["INT"] = 1] = "INT";
     Tipo[Tipo["DOUBLE"] = 2] = "DOUBLE";

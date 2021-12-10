@@ -170,4 +170,5 @@ PRIMITIVA:
     | charliteral                       { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
     | null                              { $$ = new Primitivo(null, @1.first_line, @1.first_column); }
     | true                              { $$ = new Primitivo(true, @1.first_line, @1.first_column); }
-    | false                             { $$ = new Primitivo(false, @1.first_line, @1.first_column); } ;
+    | false                             { $$ = new Primitivo(false, @1.first_line, @1.first_column); } 
+;
