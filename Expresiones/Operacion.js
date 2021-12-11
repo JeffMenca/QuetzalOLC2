@@ -17,8 +17,8 @@ var Operador;
     Operador[Operador["OR"] = 10] = "OR";
     Operador[Operador["AND"] = 11] = "AND";
     Operador[Operador["NOT"] = 12] = "NOT";
-    Operador[Operador["MAYOR_IGUA_QUE"] = 13] = "MAYOR_IGUA_QUE";
-    Operador[Operador["MENOR_IGUA_QUE"] = 14] = "MENOR_IGUA_QUE";
+    Operador[Operador["MAYOR_IGUAL_QUE"] = 13] = "MAYOR_IGUAL_QUE";
+    Operador[Operador["MENOR_IGUAL_QUE"] = 14] = "MENOR_IGUAL_QUE";
     Operador[Operador["DESCONOCIDO"] = 15] = "DESCONOCIDO";
 })(Operador = exports.Operador || (exports.Operador = {}));
 var Operacion = /** @class */ (function () {
@@ -71,7 +71,7 @@ var Operacion = /** @class */ (function () {
                     return op1 - op2;
                 }
                 else {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una resta");
                     return null;
                 }
             }
@@ -81,7 +81,7 @@ var Operacion = /** @class */ (function () {
                     return op1 * op2;
                 }
                 else {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una multiplicacion");
                     return null;
                 }
             }
@@ -95,7 +95,7 @@ var Operacion = /** @class */ (function () {
                     return op1 / op2;
                 }
                 else {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una division");
                     return null;
                 }
             }
@@ -109,7 +109,87 @@ var Operacion = /** @class */ (function () {
                     return op1 % op2;
                 }
                 else {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando un modulo");
+                    return null;
+                }
+            }
+            //Menor que
+            else if (this.operador == Operador.MENOR_QUE) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 < op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Mayor que
+            else if (this.operador == Operador.MAYOR_QUE) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 > op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Menor igual que
+            else if (this.operador == Operador.MENOR_IGUAL_QUE) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 <= op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Mayor igual que
+            else if (this.operador == Operador.MAYOR_IGUAL_QUE) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 >= op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Igual que
+            else if (this.operador == Operador.IGUAL_IGUAL) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 == op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Diferente que
+            else if (this.operador == Operador.DIFERENTE_QUE) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return op1 != op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //And
+            else if (this.operador == Operador.AND) {
+                if (typeof (op1 === "boolean") && typeof (op2 === "boolean")) {
+                    return op1 && op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion and");
+                    return null;
+                }
+            }
+            //Or
+            else if (this.operador == Operador.OR) {
+                if (typeof (op1 === "boolean") && typeof (op2 === "boolean")) {
+                    return op1 || op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion or");
                     return null;
                 }
             }
@@ -122,6 +202,15 @@ var Operacion = /** @class */ (function () {
                 }
                 else {
                     console.log("Error de tipos de datos no permitidos realizando una operación unaria");
+                    return null;
+                }
+            }
+            else if (this.operador == Operador.NOT) {
+                if (typeof (op1 === "boolean")) {
+                    return !op1;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion not");
                     return null;
                 }
             }

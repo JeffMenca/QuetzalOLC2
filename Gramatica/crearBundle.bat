@@ -1,0 +1,1 @@
+browserify generador.js -o bundle.js

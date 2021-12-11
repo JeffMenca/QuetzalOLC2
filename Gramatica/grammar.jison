@@ -54,17 +54,17 @@ BSL                                 "\\".
 "-"                   return 'minus'
 "+"                   return 'plus'
 "^"                   return 'pot'
-"!"                   return 'dif'
 "%"                   return 'mod'
 "("                   return 'lparen'
 ")"                   return 'rparen'
+"=="                  return 'equal'
+"="                   return 'asign'
+"!="                  return 'noequal'
+"!"                   return 'not'
+"<="                  return 'lte'
+">="                  return 'gte'
 "<"                   return 'lt'
 ">"                   return 'gt'
-"="                   return 'asig'
-"=="                  return 'equal'
-"!="                  return 'nequal'
-"<="                  return 'lge'
-">="                  return 'gte'
 "&&"                  return 'and'
 "||"                  return 'or'
 ";"                   return 'semicolon'
@@ -74,7 +74,7 @@ BSL                                 "\\".
 "$"                   return 'doll'
 
 /* ERROR LEXICO  */
-.                     {console.error('Errorléxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', y columna: ' + yylloc.first_column);}
+.                     {console.error('Error léxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', y columna: ' + yylloc.first_column);}
 <<EOF>>               return 'EOF'
 .                     return 'INVALID'
 
@@ -93,12 +93,12 @@ BSL                                 "\\".
 %left 'or'
 %left 'and'
 %left 'dif'
-%left 'equal' 'nequal' 'lt' 'lge' 'gt' 'gte'
+%left 'equal' 'noequal' 'lte' 'lt' 'gte' 'gt'
 %left 'amp'
 %left 'plus' 'minus'
 %left 'multi' 'div'
 %left 'pot'
-%right 'dif'
+%right 'not'
 %right 'mod'
 %left UMINUS
 
@@ -114,43 +114,18 @@ RAICES:
 	| RAIZ                { $$ = [$1]; } ;
 
 RAIZ:
-    PRINT semicolon       { $$ = $1 }
-    | OBJETO              { $$ = $1 }
-;
-
-OBJETO:
-      lt identifier LATRIBUTOS gt OBJETOS           lt div identifier gt       { $$ = new Objeto($2,'',@1.first_line, @1.first_column,$3,$5); }
-    | lt identifier LATRIBUTOS gt LISTA_ID_OBJETO   lt div identifier gt       { $$ = new Objeto($2,$5,@1.first_line, @1.first_column,$3,[]); }
-    | lt identifier LATRIBUTOS div gt                                          { $$ = new Objeto($2,'',@1.first_line, @1.first_column,$3,[]); }
-;
-
-LATRIBUTOS: ATRIBUTOS                               { $$ = $1; }
-           |                                        { $$ = []; }
-;
-
-ATRIBUTOS:
-    ATRIBUTOS ATRIBUTO                              { $1.push($2); $$ = $1;}
-    | ATRIBUTO                                      { $$ = [$1]; } 
-;
-
-ATRIBUTO: 
-    identifier asig StringLiteral                   { $$ = new Atributo($1, $3, @1.first_line, @1.first_column); }
-;
-
-LISTA_ID_OBJETO: LISTA_ID_OBJETO identifier          { $1=$1 + ' ' +$2 ; $$ = $1;}
-        | identifier                                 { $$ = $1 }
-;
-
-OBJETOS:
-      OBJETOS OBJETO        { $1.push($2); $$ = $1;}
-	| OBJETO                { $$ = [$1]; } ;
+    PRINT semicolon       { $$ = $1 };
 
 PRINT:
-    print lparen EXPR rparen            { $$ = new Print($3, @1.first_line, @1.first_column); } ;
+    print lparen EXPR rparen            { $$ = new Print($3, @1.first_line, @1.first_column); } 
+    | println lparen EXPR rparen        { $$ = new Print($3, @1.first_line, @1.first_column,true); } ;
 
 EXPR:
     PRIMITIVA                           { $$ = $1 }
-    | OP_ARITMETICAS                    { $$ = $1 };
+    | OP_ARITMETICAS                    { $$ = $1 }
+    | OP_RELACIONALES                   { $$ = $1 }
+    | OP_LOGICAS                { $$ = $1 }
+;
 
 
 OP_ARITMETICAS:
@@ -160,15 +135,30 @@ OP_ARITMETICAS:
     | EXPR div EXPR                     { $$ = new Operacion($1,$3,Operador.DIVISION, @1.first_line, @1.first_column); }
     | EXPR mod EXPR                     { $$ = new Operacion($1,$3,Operador.MODULO, @1.first_line, @1.first_column); }
     | minus EXPR %prec UMINUS           { $$ = new Operacion($2,$2,Operador.MENOS_UNARIO, @1.first_line, @1.first_column); }
-    | lparen EXPR rparen                { $$ = $2 }
+;
+
+OP_RELACIONALES:
+    EXPR lt EXPR                      { $$ = new Operacion($1,$3,Operador.MENOR_QUE, @1.first_line, @1.first_column); }
+    | EXPR lte EXPR                   { $$ = new Operacion($1,$3,Operador.MENOR_IGUAL_QUE, @1.first_line, @1.first_column); }
+    | EXPR gt EXPR                    { $$ = new Operacion($1,$3,Operador.MAYOR_QUE, @1.first_line, @1.first_column); }
+    | EXPR gte EXPR                   { $$ = new Operacion($1,$3,Operador.MAYOR_IGUAL_QUE, @1.first_line, @1.first_column); }
+    | EXPR equal EXPR                 { $$ = new Operacion($1,$3,Operador.IGUAL_IGUAL, @1.first_line, @1.first_column); }
+    | EXPR noequal EXPR               { $$ = new Operacion($1,$3,Operador.DIFERENTE_QUE, @1.first_line, @1.first_column); }
+;
+
+OP_LOGICAS:
+    EXPR and EXPR                    { $$ = new Operacion($1,$3,Operador.AND, @1.first_line, @1.first_column); }
+    | EXPR or EXPR                   { $$ = new Operacion($1,$3,Operador.OR, @1.first_line, @1.first_column); }
+    | not EXPR                       { $$ = new Operacion($2,$2,Operador.NOT, @1.first_line, @1.first_column); }
 ;
 
 PRIMITIVA:
     IntegerLiteral                      { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
     | DoubleLiteral                     { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
-    | StringLiteral                     { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
+    | StringLiteral                     { $$ = new Primitivo($1.replace(/['"]+/g, ''), @1.first_line, @1.first_column); }
     | charliteral                       { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
     | null                              { $$ = new Primitivo(null, @1.first_line, @1.first_column); }
     | true                              { $$ = new Primitivo(true, @1.first_line, @1.first_column); }
     | false                             { $$ = new Primitivo(false, @1.first_line, @1.first_column); } 
+    | lparen EXPR rparen                { $$ = $2 }
 ;

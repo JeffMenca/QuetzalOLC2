@@ -17,7 +17,7 @@
         function parseInput() {
             let result = parseGrammar(document.getElementById("text").value);
             let results = "";
-            result.forEach(element => results = results + element + "\n");
+            result.forEach(element => results = results + element);
             document.getElementById("result").innerHTML = `El resultado es: ${results}`;
             console.log(results);
         }

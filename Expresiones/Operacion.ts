@@ -17,8 +17,8 @@ export enum Operador {
     OR,
     AND,
     NOT,
-    MAYOR_IGUA_QUE,
-    MENOR_IGUA_QUE,
+    MAYOR_IGUAL_QUE,
+    MENOR_IGUAL_QUE,
     DESCONOCIDO
 }
 
@@ -92,7 +92,7 @@ export class Operacion implements Expresion {
                 }
                 else
                 {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una resta");
                     return null;
                 }
             }
@@ -105,7 +105,7 @@ export class Operacion implements Expresion {
                 }
                 else
                 {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una multiplicacion");
                     return null;
                 }
             }
@@ -122,7 +122,7 @@ export class Operacion implements Expresion {
                 }
                 else
                 {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando una division");
                     return null;
                 }
             }
@@ -139,11 +139,115 @@ export class Operacion implements Expresion {
                 }
                 else
                 {
-                    console.log("Error de tipos de datos no permitidos realizando una suma");
+                    console.log("Error de tipos de datos no permitidos realizando un modulo");
                     return null;
                 }
             }
-
+            //Menor que
+            else if (this.operador == Operador.MENOR_QUE)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 < op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Mayor que
+            else if (this.operador == Operador.MAYOR_QUE)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 > op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Menor igual que
+            else if (this.operador == Operador.MENOR_IGUAL_QUE)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 <= op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Mayor igual que
+            else if (this.operador == Operador.MAYOR_IGUAL_QUE)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 >= op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Igual que
+            else if (this.operador == Operador.IGUAL_IGUAL)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 == op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //Diferente que
+            else if (this.operador == Operador.DIFERENTE_QUE)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return op1 != op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion");
+                    return null;
+                }
+            }
+            //And
+            else if (this.operador == Operador.AND)
+            {
+                if (typeof(op1==="boolean") && typeof(op2==="boolean"))
+                {
+                    return op1 && op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion and");
+                    return null;
+                }
+            }
+            //Or
+            else if (this.operador == Operador.OR)
+            {
+                if (typeof(op1==="boolean") && typeof(op2==="boolean"))
+                {
+                    return op1 || op2;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion or");
+                    return null;
+                }
+            }
+            
         }else{
             let op1 = this.op_izquierda.getValorImplicito(ent, arbol);
             if (this.operador == Operador.MENOS_UNARIO)
@@ -155,6 +259,17 @@ export class Operacion implements Expresion {
                 else
                 {
                     console.log("Error de tipos de datos no permitidos realizando una operación unaria");
+                    return null;
+                }
+            }else if (this.operador == Operador.NOT)
+            {
+                if (typeof(op1==="boolean"))
+                {
+                    return ! op1;
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una comparacion not");
                     return null;
                 }
             }
