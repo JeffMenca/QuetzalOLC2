@@ -71,6 +71,7 @@ BSL                                 "\\".
 ":"                   return 'dosp'
 "?"                   return 'quest'
 "&"                   return 'amp'
+","                   return 'coma'
 "$"                   return 'doll'
 
 /* ERROR LEXICO  */
@@ -83,10 +84,14 @@ BSL                                 "\\".
 /* IMPORTS  */
 %{
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
+    const {Declaracion} = require("../Instrucciones/Declaracion.js");
+    const {Asignacion} = require("../Instrucciones/Asignacion.js");
+    const {Tipo} = require("../AST/Tipo.js");
     const {Primitivo} = require("../Expresiones/Primitivo.js");
     const {Operacion, Operador} = require("../Expresiones/Operacion.js");
     const {Objeto} = require("../Expresiones/Objeto.js");
     const {Atributo} = require("../Expresiones/Atributo.js");
+    const {AccesoVariable} = require("../Expresiones/AccesoVariable.js");
 %}
 
 /* PRECEDENCIA */
@@ -114,17 +119,38 @@ RAICES:
 	| RAIZ                { $$ = [$1]; } ;
 
 RAIZ:
-    PRINT semicolon       { $$ = $1 };
+    PRINT semicolon          { $$ = $1 }
+    | DECLARACION semicolon  { $$ = $1 }
+    | ASIGNACION semicolon  { $$ = $1 };
+
+ASIGNACION:
+    identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
+;
+
+DECLARACION:
+        TIPO LISTA_ID                   { $$ = new Declaracion($2, $1, @1.first_line, @1.first_column); } 
+    | TIPO identifier asign EXPR        { $$ = new Declaracion([$2],$1, @1.first_line, @1.first_column,$4); } ;
 
 PRINT:
     print lparen EXPR rparen            { $$ = new Print($3, @1.first_line, @1.first_column); } 
     | println lparen EXPR rparen        { $$ = new Print($3, @1.first_line, @1.first_column,true); } ;
 
+LISTA_ID: LISTA_ID coma identifier      { $1.push($3); $$ = $1; } 
+        | identifier                    { $$ = [$1]; } 
+;
+
+TIPO:
+    int                 { $$ = Tipo.INT; }
+    | double            { $$  = Tipo.DOUBLE; }
+    | boolean           { $$  = Tipo.BOOL; }
+    | string            { $$  = Tipo.STRING; }
+;
+
 EXPR:
     PRIMITIVA                           { $$ = $1 }
     | OP_ARITMETICAS                    { $$ = $1 }
     | OP_RELACIONALES                   { $$ = $1 }
-    | OP_LOGICAS                { $$ = $1 }
+    | OP_LOGICAS                        { $$ = $1 }
 ;
 
 
@@ -160,5 +186,6 @@ PRIMITIVA:
     | null                              { $$ = new Primitivo(null, @1.first_line, @1.first_column); }
     | true                              { $$ = new Primitivo(true, @1.first_line, @1.first_column); }
     | false                             { $$ = new Primitivo(false, @1.first_line, @1.first_column); } 
+    | identifier                        { $$ = new AccesoVariable($1, @1.first_line, @1.first_column);}
     | lparen EXPR rparen                { $$ = $2 }
 ;
