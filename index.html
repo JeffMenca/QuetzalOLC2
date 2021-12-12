@@ -5,20 +5,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
     <title>Quetzal OLC2</title>
 </head>
 
 <body>
-    <h1>Calculadora con JISON</h1>
-    <input type="text" id="text" placeholder="Ingrese operacion">
-    <input type="button" value="Enter" onclick="parseInput()">
-    <h2 id="result"></h2>
+    <!-- INPUTS AND STRUCTURES -->
+    <img src="css/media/logo.png" width="100" height="125" class="center">
+    <div style="width: 100%; float:left">
+        <div style="width: 45%; background-color: #3d3d3d; margin-left: 25px; float:left">
+            <input type="text" class="titleCenter" value="CODE AND RUN">
+            <input type="button" class="compile" value="&#9658;" onclick="parseInput()">
+        </div>
+        <div style="width: 45%; background-color: #3d3d3d; margin-right: 25px; float:right">
+            <input type="text" class="titleCenter2" value="3D CODE">
+            <input type="button" class="compile" value="&#10132;" onclick="parseInput()">
+        </div>
+    </div>
+    <div style="width: 45%; margin-left: 25px; float:left">
+        <textarea id="editor"></textarea>
+    </div>
+    <div style="width: 45%; margin-right: 25px; float:right">
+        <textarea id="threed">*Codigo de 3 direcciones* </textarea>
+    </div>
+    <div>
+        <div class="title">
+            <input type="text" class="titleEnter" value="OUTPUT">
+        </div>
+        <textarea id="result" class="result" readonly></textarea>
+    </div>
+
+
+    <!-- CODE MIRROR LIBRARIES -->
+    <script src="codemirror/lib/codemirror.js"></script>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+    <script src="codemirror/mode/clike/clike.js"></script>
+    <link rel="stylesheet" href="codemirror/theme/material-darker.css">
+    <script>
+        var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
+            mode: "text/x-java",
+            theme: "material-darker",
+            lineNumbers: true
+        });
+        editor.setSize("100%", "350");
+        var threed = CodeMirror.fromTextArea(document.getElementById("threed"), {
+            mode: "text/x-csrc",
+            theme: "material-darker",
+            lineNumbers: true
+        });
+        threed.setSize("100%", "350");
+
+        function getCode() {
+            return editor.getValue();
+        }
+    </script>
+
+    <!-- PARSE AND GRAMMAR  -->
     <script>
         function parseInput() {
-            let result = parseGrammar(document.getElementById("text").value);
+            let result = parseGrammar(getCode());
             let results = "";
             result.forEach(element => results = results + element);
-            document.getElementById("result").innerHTML = `El resultado es: ${results}`;
+            document.getElementById("result").innerHTML = `${results}`;
             console.log(results);
         }
     </script>

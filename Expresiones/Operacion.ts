@@ -19,6 +19,8 @@ export enum Operador {
     NOT,
     MAYOR_IGUAL_QUE,
     MENOR_IGUAL_QUE,
+    POW,
+    SQRT,
     DESCONOCIDO
 }
 
@@ -244,6 +246,32 @@ export class Operacion implements Expresion {
                 else
                 {
                     console.log("Error de tipos de datos no permitidos realizando una comparacion or");
+                    return null;
+                }
+            }
+            //POW
+            else if (this.operador == Operador.POW)
+            {
+                if (typeof(op1==="number") && typeof(op2==="number"))
+                {
+                    return Math.pow(op1, op2);
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una potencia");
+                    return null;
+                }
+            }
+            //SQRT
+            else if (this.operador == Operador.SQRT)
+            {
+                if (typeof(op1==="number"))
+                {
+                    return Math.sqrt(op1);
+                }
+                else
+                {
+                    console.log("Error de tipos de datos no permitidos realizando una raiz");
                     return null;
                 }
             }

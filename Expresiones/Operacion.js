@@ -19,7 +19,9 @@ var Operador;
     Operador[Operador["NOT"] = 12] = "NOT";
     Operador[Operador["MAYOR_IGUAL_QUE"] = 13] = "MAYOR_IGUAL_QUE";
     Operador[Operador["MENOR_IGUAL_QUE"] = 14] = "MENOR_IGUAL_QUE";
-    Operador[Operador["DESCONOCIDO"] = 15] = "DESCONOCIDO";
+    Operador[Operador["POW"] = 15] = "POW";
+    Operador[Operador["SQRT"] = 16] = "SQRT";
+    Operador[Operador["DESCONOCIDO"] = 17] = "DESCONOCIDO";
 })(Operador = exports.Operador || (exports.Operador = {}));
 var Operacion = /** @class */ (function () {
     function Operacion(op_izquierda, op_derecha, operacion, linea, columna) {
@@ -190,6 +192,26 @@ var Operacion = /** @class */ (function () {
                 }
                 else {
                     console.log("Error de tipos de datos no permitidos realizando una comparacion or");
+                    return null;
+                }
+            }
+            //POW
+            else if (this.operador == Operador.POW) {
+                if (typeof (op1 === "number") && typeof (op2 === "number")) {
+                    return Math.pow(op1, op2);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una potencia");
+                    return null;
+                }
+            }
+            //SQRT
+            else if (this.operador == Operador.SQRT) {
+                if (typeof (op1 === "number")) {
+                    return Math.sqrt(op1);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando una raiz");
                     return null;
                 }
             }
