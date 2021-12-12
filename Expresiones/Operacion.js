@@ -21,7 +21,10 @@ var Operador;
     Operador[Operador["MENOR_IGUAL_QUE"] = 14] = "MENOR_IGUAL_QUE";
     Operador[Operador["POW"] = 15] = "POW";
     Operador[Operador["SQRT"] = 16] = "SQRT";
-    Operador[Operador["DESCONOCIDO"] = 17] = "DESCONOCIDO";
+    Operador[Operador["SENO"] = 17] = "SENO";
+    Operador[Operador["COSENO"] = 18] = "COSENO";
+    Operador[Operador["TAN"] = 19] = "TAN";
+    Operador[Operador["DESCONOCIDO"] = 20] = "DESCONOCIDO";
 })(Operador = exports.Operador || (exports.Operador = {}));
 var Operacion = /** @class */ (function () {
     function Operacion(op_izquierda, op_derecha, operacion, linea, columna) {
@@ -212,6 +215,36 @@ var Operacion = /** @class */ (function () {
                 }
                 else {
                     console.log("Error de tipos de datos no permitidos realizando una raiz");
+                    return null;
+                }
+            }
+            //SENO
+            else if (this.operador == Operador.SENO) {
+                if (typeof (op1 === "number")) {
+                    return Math.sin(op1);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando seno");
+                    return null;
+                }
+            }
+            //COSENO
+            else if (this.operador == Operador.COSENO) {
+                if (typeof (op1 === "number")) {
+                    return Math.cos(op1);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando coseno");
+                    return null;
+                }
+            }
+            //TANGENTE
+            else if (this.operador == Operador.TAN) {
+                if (typeof (op1 === "number")) {
+                    return Math.tan(op1);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando tangente");
                     return null;
                 }
             }
