@@ -29,9 +29,10 @@ BSL                                 "\\".
 "tan"                 return 'tan'
 "print"               return 'print'
 "println"             return 'println'
-"while"               return 'while'
 "true"                return 'true'
 "false"               return 'false'
+"if"                  return 'if'
+"else"                return 'else'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -58,8 +59,6 @@ BSL                                 "\\".
 "%"                   return 'mod'
 "("                   return 'lparen'
 ")"                   return 'rparen'
-"{"                   return 'lllave'
-"}"                   return 'rllave'
 "=="                  return 'equal'
 "="                   return 'asign'
 "!="                  return 'noequal'
@@ -73,6 +72,8 @@ BSL                                 "\\".
 ";"                   return 'semicolon'
 ":"                   return 'dosp'
 "?"                   return 'quest'
+"{"                   return 'lllave'
+"}"                   return 'rllave'
 "&"                   return 'amp'
 ","                   return 'coma'
 "$"                   return 'doll'
@@ -87,9 +88,9 @@ BSL                                 "\\".
 /* IMPORTS  */
 %{
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
+    const {If} = require("../Instrucciones/If.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
-    const {While} = require("../Instrucciones/While.js");
     const {Tipo} = require("../AST/Tipo.js");
     const {Primitivo} = require("../Expresiones/Primitivo.js");
     const {Operacion, Operador} = require("../Expresiones/Operacion.js");
@@ -120,20 +121,25 @@ START : LISTA_INSTRUCCIONES EOF         { $$ = $1; return $$; }
 
 LISTA_INSTRUCCIONES: 
     LISTA_INSTRUCCIONES INSTRUCCION { $1.push($2); $$ = $1; }
-    | INSTRUCCION { $$ = [$1]; } 
-;
+    | INSTRUCCION { $$ = [$1]; } ;
 
 INSTRUCCION:
-    PRINT semicolon          { $$ = $1 }
-    | DECLARACION semicolon  { $$ = $1 }
-    | ASIGNACION semicolon   { $$ = $1 }
-    | WHILE                  { $$ = $1 }
+    PRINT semicolon          { $$ = $1; }
+    | DECLARACION semicolon  { $$ = $1; }
+    | ASIGNACION semicolon   { $$ = $1; }
+    | IF                     { $$ = $1; }
 ;
 
-WHILE:
-    while lparen EXPR rparen INSTRUCCION { $$ = new While($3, [$5], @1.first_line, @1.first_column); } 
-    | while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
+IF:
+    if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave             { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave ELSE      { $$ = new If($3, $6, $8,[], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave else IF   { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
 ;
+
+ELSE:
+    else lllave LISTA_INSTRUCCIONES rllave      {$$ = $3;}
+;
+
 
 ASIGNACION:
     identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 

@@ -25,6 +25,30 @@ if (typeof window !== 'undefined') {
                         }
                     });
                 }
+            } else if (name == "If") {
+                const entornoIf = new Entorno.Entorno(entornoGlobal);
+                let acciones = element.ejecutar(entornoIf, ast);
+                console.log(acciones);
+                if (element.condicion.getValorImplicito(entornoIf, ast)) {
+                    acciones.forEach(function(element2) {
+                        let elementos = element2.ejecutar(entornoIf, ast);
+                        let name2 = element2.constructor.name;
+                        if (name2 === "Print") {
+                            resultados.push(elementos);
+                        }
+                    });
+                } else {
+                    const entornoElse = new Entorno.Entorno(entornoGlobal);
+                    let acciones = element.ejecutar(entornoElse, ast);
+                    console.log(acciones);
+                    acciones.forEach(function(element2) {
+                        let elementos = element2.ejecutar(entornoElse, ast);
+                        let name2 = element2.constructor.name;
+                        if (name2 === "Print") {
+                            resultados.push(elementos);
+                        }
+                    });
+                }
             } else {
                 let elementos = element.ejecutar(entornoGlobal, ast);
                 //PRINTS

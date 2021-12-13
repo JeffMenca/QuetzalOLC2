@@ -38,6 +38,4 @@ export class Asignacion implements Instruccion {
             }
     }
 
-    
-
 }

@@ -41,10 +41,12 @@ var Entorno = /** @class */ (function () {
     };
     Entorno.prototype.getSimbolo = function (id) {
         id = id.toLowerCase();
-        for (var e = this; e != null; e = e.anterior) {
+        var e = this;
+        while (e != null) {
             if (e.tabla[id] !== undefined) {
                 return e.tabla[id];
             }
+            e = e.anterior;
         }
         return null;
     };

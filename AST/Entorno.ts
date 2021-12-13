@@ -54,12 +54,12 @@ export class Entorno{
 
     getSimbolo(id:string):any{
         id = id.toLowerCase();
-        for (let e:Entorno = this; e != null; e = e.anterior)
-        {
-            if (e.tabla[id]!==undefined)
-            {
+        let e:Entorno = this;
+        while(e!=null){
+            if(e.tabla[id] !== undefined){
                 return e.tabla[id];
             }
+            e = e.anterior;
         }
         return null;
     }
