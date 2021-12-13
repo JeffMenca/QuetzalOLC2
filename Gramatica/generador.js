@@ -11,10 +11,26 @@ if (typeof window !== 'undefined') {
         const entornoGlobal = new Entorno.Entorno(null);
         let resultados = [];
         instrucciones.forEach(function(element) {
-            let elementos = element.ejecutar(entornoGlobal, ast);
             let name = element.constructor.name;
-            if (name === "Print") {
-                resultados.push(elementos);
+            //WHILE
+            if (name == "While") {
+                const entornoWhile = new Entorno.Entorno(entornoGlobal);
+                let acciones = element.ejecutar(entornoWhile, ast);
+                if (element.condicion.getValorImplicito(entornoWhile, ast)) {
+                    acciones.forEach(function(element2) {
+                        let elementos = element2.ejecutar(entornoWhile, ast);
+                        let name2 = element2.constructor.name;
+                        if (name2 === "Print") {
+                            resultados.push(elementos);
+                        }
+                    });
+                }
+            } else {
+                let elementos = element.ejecutar(entornoGlobal, ast);
+                //PRINTS
+                if (name === "Print") {
+                    resultados.push(elementos);
+                }
             }
         });
         return resultados;

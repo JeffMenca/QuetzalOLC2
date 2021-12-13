@@ -29,6 +29,7 @@ BSL                                 "\\".
 "tan"                 return 'tan'
 "print"               return 'print'
 "println"             return 'println'
+"while"               return 'while'
 "true"                return 'true'
 "false"               return 'false'
 
@@ -57,6 +58,8 @@ BSL                                 "\\".
 "%"                   return 'mod'
 "("                   return 'lparen'
 ")"                   return 'rparen'
+"{"                   return 'lllave'
+"}"                   return 'rllave'
 "=="                  return 'equal'
 "="                   return 'asign'
 "!="                  return 'noequal'
@@ -86,6 +89,7 @@ BSL                                 "\\".
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
+    const {While} = require("../Instrucciones/While.js");
     const {Tipo} = require("../AST/Tipo.js");
     const {Primitivo} = require("../Expresiones/Primitivo.js");
     const {Operacion, Operador} = require("../Expresiones/Operacion.js");
@@ -111,17 +115,25 @@ BSL                                 "\\".
 
 %% /* GRAMATICA*/
 
-START : RAICES EOF         { $$ = $1; return $$; }
+START : LISTA_INSTRUCCIONES EOF         { $$ = $1; return $$; }
     ;
 
-RAICES:
-    RAICES RAIZ           { $1.push($2); $$ = $1;}
-	| RAIZ                { $$ = [$1]; } ;
+LISTA_INSTRUCCIONES: 
+    LISTA_INSTRUCCIONES INSTRUCCION { $1.push($2); $$ = $1; }
+    | INSTRUCCION { $$ = [$1]; } 
+;
 
-RAIZ:
+INSTRUCCION:
     PRINT semicolon          { $$ = $1 }
     | DECLARACION semicolon  { $$ = $1 }
-    | ASIGNACION semicolon  { $$ = $1 };
+    | ASIGNACION semicolon   { $$ = $1 }
+    | WHILE                  { $$ = $1 }
+;
+
+WHILE:
+    while lparen EXPR rparen INSTRUCCION { $$ = new While($3, [$5], @1.first_line, @1.first_column); } 
+    | while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
+;
 
 ASIGNACION:
     identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
