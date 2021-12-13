@@ -31,6 +31,8 @@ BSL                                 "\\".
 "println"             return 'println'
 "true"                return 'true'
 "false"               return 'false'
+"if"                  return 'if'
+"else"                return 'else'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -70,6 +72,8 @@ BSL                                 "\\".
 ";"                   return 'semicolon'
 ":"                   return 'dosp'
 "?"                   return 'quest'
+"{"                   return 'lllave'
+"}"                   return 'rllave'
 "&"                   return 'amp'
 ","                   return 'coma'
 "$"                   return 'doll'
@@ -84,6 +88,7 @@ BSL                                 "\\".
 /* IMPORTS  */
 %{
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
+    const {If} = require("../Instrucciones/If.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
     const {Tipo} = require("../AST/Tipo.js");
@@ -111,17 +116,30 @@ BSL                                 "\\".
 
 %% /* GRAMATICA*/
 
-START : RAICES EOF         { $$ = $1; return $$; }
+START : LISTA_INSTRUCCIONES EOF         { $$ = $1; return $$; }
     ;
 
-RAICES:
-    RAICES RAIZ           { $1.push($2); $$ = $1;}
-	| RAIZ                { $$ = [$1]; } ;
+LISTA_INSTRUCCIONES: 
+    LISTA_INSTRUCCIONES INSTRUCCION { $1.push($2); $$ = $1; }
+    | INSTRUCCION { $$ = [$1]; } ;
 
-RAIZ:
-    PRINT semicolon          { $$ = $1 }
-    | DECLARACION semicolon  { $$ = $1 }
-    | ASIGNACION semicolon  { $$ = $1 };
+INSTRUCCION:
+    PRINT semicolon          { $$ = $1; }
+    | DECLARACION semicolon  { $$ = $1; }
+    | ASIGNACION semicolon   { $$ = $1; }
+    | IF                     { $$ = $1; }
+;
+
+IF:
+    if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave             { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave ELSE      { $$ = new If($3, $6, $8,[], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave else IF   { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
+;
+
+ELSE:
+    else lllave LISTA_INSTRUCCIONES rllave      {$$ = $3;}
+;
+
 
 ASIGNACION:
     identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
