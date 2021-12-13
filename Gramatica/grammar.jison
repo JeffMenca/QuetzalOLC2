@@ -33,6 +33,7 @@ BSL                                 "\\".
 "false"               return 'false'
 "if"                  return 'if'
 "else"                return 'else'
+"while"               return 'while'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -89,6 +90,7 @@ BSL                                 "\\".
 %{
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
     const {If} = require("../Instrucciones/If.js");
+    const {While} = require("../Instrucciones/While.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
     const {Tipo} = require("../AST/Tipo.js");
@@ -128,6 +130,7 @@ INSTRUCCION:
     | DECLARACION semicolon  { $$ = $1; }
     | ASIGNACION semicolon   { $$ = $1; }
     | IF                     { $$ = $1; }
+    | WHILE                  { $$ = $1; }
 ;
 
 IF:
@@ -140,6 +143,10 @@ ELSE:
     else lllave LISTA_INSTRUCCIONES rllave      {$$ = $3;}
 ;
 
+WHILE:
+    while lparen EXPR rparen INSTRUCCION { $$ = new While($3, [$5], @1.first_line, @1.first_column); } 
+    | while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
+;
 
 ASIGNACION:
     identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
