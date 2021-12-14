@@ -21,23 +21,7 @@ export class While implements Instruccion {
     }
 
     ejecutar(ent: Entorno, arbol: AST) {
-        let times = 0;
-        while (true) {
-            if (this.condicion.getValorImplicito(ent, arbol)) {
-                times = times + 1;
-                if (times == 5) {
-                    break;
-                }
-            }
-            else {
-                break;
-            }
-        }
-        for (let i = 0; i < times; i++) {
-            let acciones = this.lista_instrucciones_while;
-            this.lista_instrucciones_while = this.lista_instrucciones_while.concat(acciones);
-        }
-        return this.lista_instrucciones_while
+        return this.lista_instrucciones_while;
     }
 
 }

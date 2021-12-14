@@ -136,7 +136,8 @@ INSTRUCCION:
 IF:
     if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave             { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
     | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave ELSE      { $$ = new If($3, $6, $8,[], @1.first_line, @1.first_column); } 
-    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave else IF   { $$ = new If($3, $6,[],[], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave else IF   { $$ = new If($3, $6,[],[$9], @1.first_line, @1.first_column); } 
+    | if lparen EXPR rparen INSTRUCCION                                 { $$ = new If($3, [$5],[],[], @1.first_line, @1.first_column); } 
 ;
 
 ELSE:

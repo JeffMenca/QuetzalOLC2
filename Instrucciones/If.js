@@ -19,7 +19,14 @@ var If = /** @class */ (function () {
             return this.lista_instrucciones;
         }
         else {
-            return this.lista_instrucciones_else;
+            var accion_1;
+            this.lista_instrucciones_elseif.forEach(function (element) {
+                accion_1 = element.ejecutar(ent, arbol);
+            });
+            if (this.lista_instrucciones_else.length > 0) {
+                return this.lista_instrucciones_else;
+            }
+            return accion_1;
         }
     };
     return If;

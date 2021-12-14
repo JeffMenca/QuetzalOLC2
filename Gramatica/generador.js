@@ -14,41 +14,16 @@ if (typeof window !== 'undefined') {
             let name = element.constructor.name;
             //WHILE
             if (name == "While") {
-                const entornoWhile = new Entorno.Entorno(entornoGlobal);
-                let acciones = element.ejecutar(entornoWhile, ast);
-                if (element.condicion.getValorImplicito(entornoWhile, ast)) {
-                    acciones.forEach(function(element2) {
-                        let elementos = element2.ejecutar(entornoWhile, ast);
-                        let name2 = element2.constructor.name;
-                        if (name2 === "Print") {
-                            resultados.push(elementos);
-                        }
-                    });
-                }
+                let accionesWhile = actionWhile(element, entornoGlobal, ast);
+                accionesWhile.forEach(function(element2) {
+                    resultados.push(element2);
+                });
+                //IF
             } else if (name == "If") {
-                const entornoIf = new Entorno.Entorno(entornoGlobal);
-                let acciones = element.ejecutar(entornoIf, ast);
-                console.log(acciones);
-                if (element.condicion.getValorImplicito(entornoIf, ast)) {
-                    acciones.forEach(function(element2) {
-                        let elementos = element2.ejecutar(entornoIf, ast);
-                        let name2 = element2.constructor.name;
-                        if (name2 === "Print") {
-                            resultados.push(elementos);
-                        }
-                    });
-                } else {
-                    const entornoElse = new Entorno.Entorno(entornoGlobal);
-                    let acciones = element.ejecutar(entornoElse, ast);
-                    console.log(acciones);
-                    acciones.forEach(function(element2) {
-                        let elementos = element2.ejecutar(entornoElse, ast);
-                        let name2 = element2.constructor.name;
-                        if (name2 === "Print") {
-                            resultados.push(elementos);
-                        }
-                    });
-                }
+                let accionesIf = actionIf(element, entornoGlobal, ast);
+                accionesIf.forEach(function(element2) {
+                    resultados.push(element2);
+                });
             } else {
                 let elementos = element.ejecutar(entornoGlobal, ast);
                 //PRINTS
@@ -59,4 +34,64 @@ if (typeof window !== 'undefined') {
         });
         return resultados;
     }
+}
+
+function actionWhile(element, ent, ast) {
+    const entornoWhile = new Entorno.Entorno(ent);
+    let resultados = [];
+    while (element.condicion.getValorImplicito(entornoWhile, ast)) {
+        let acciones = element.ejecutar(entornoWhile, ast);
+        if (element.condicion.getValorImplicito(entornoWhile, ast)) {
+            acciones.forEach(function(element2) {
+                let name2 = element2.constructor.name;
+                if (name2 === "If") {
+                    let acciones = actionIf(element2, entornoWhile, ast);
+                    acciones.forEach(function(element2) {
+                        resultados.push(element2);
+                    });
+                } else if (name2 === "While") {
+                    let acciones = actionWhile(element2, entornoWhile, ast);
+                    acciones.forEach(function(element2) {
+                        resultados.push(element2);
+                    });
+                } else {
+                    let elementos = element2.ejecutar(entornoWhile, ast);
+                    if (name2 === "Print") {
+                        resultados.push(elementos);
+                    }
+                }
+            });
+        } else {
+            break;
+        }
+    }
+    return resultados;
+}
+
+function actionIf(element, ent, ast) {
+    const entornoIf = new Entorno.Entorno(ent);
+    let resultados = [];
+    let acciones = element.ejecutar(entornoIf, ast);
+    if (element.condicion.getValorImplicito(entornoIf, ast)) {
+        acciones.forEach(function(element2) {
+            let name2 = element2.constructor.name;
+            let elementos = element2.ejecutar(entornoIf, ast);
+            if (name2 === "Print") {
+                resultados.push(elementos);
+            }
+        });
+    } else {
+        const entornoElse = new Entorno.Entorno(ent);
+        let acciones = element.ejecutar(entornoElse, ast);
+        if (acciones != undefined) {
+            acciones.forEach(function(element2) {
+                let name2 = element2.constructor.name;
+                let elementos = element2.ejecutar(entornoElse, ast);
+                if (name2 === "Print") {
+                    resultados.push(elementos);
+                }
+            });
+        }
+    }
+    return resultados;
 }
