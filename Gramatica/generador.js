@@ -11,7 +11,10 @@ if (typeof window !== 'undefined') {
         const entornoGlobal = new Entorno.Entorno(null);
         let acciones = [];
         instrucciones.forEach(function(element) {
-            acciones = actionGlobal(element, entornoGlobal, ast);
+            let accionesSecundarias = actionGlobal(element, entornoGlobal, ast);
+            accionesSecundarias.forEach(function(element2) {
+                acciones.push(element2);
+            });
         });
         return acciones;
     }
@@ -20,27 +23,54 @@ if (typeof window !== 'undefined') {
 function actionGlobal(element, ent, ast) {
     let name = element.constructor.name;
     let resultados = [];
+    let bandera = false;
+    let banderaContinue = false;
     if (name == "While") {
-        const entornoWhile = new Entorno.Entorno(ent);
+        let entornoWhile = new Entorno.Entorno(ent);
         while (element.condicion.getValorImplicito(entornoWhile, ast)) {
+            entornoWhile = new Entorno.Entorno(ent);
             let accionesWhile = element.ejecutar(entornoWhile, ast);
-            if (element.condicion.getValorImplicito(entornoWhile, ast)) {
-                accionesWhile.forEach(function(element2) {
-                    let name2 = element2.constructor.name;
-                    if (name2 !== "Print" && name2 !== "undefined") {
-                        let acciones = actionGlobal(element2, entornoWhile, ast);
-                        acciones.forEach(function(element2) {
+            console.log(accionesWhile);
+            for (let element2 of accionesWhile) {
+                let name2 = element2.constructor.name;
+                if (name2 == "Break") {
+                    bandera = true;
+                    break;
+                }
+                if (name2 == "Continue") {
+                    banderaContinue = true;
+                    break;
+                }
+                if (name2 !== "Print" && name2 !== "undefined") {
+                    let acciones = actionGlobal(element2, entornoWhile, ast);
+                    for (let element2 of acciones) {
+                        if (element2.constructor.name == "Break") {
+                            bandera = true;
+                            break;
+                        } else if (element2.constructor.name == "Continue") {
+                            banderaContinue = true;
+                            break;
+                        } else {
                             resultados.push(element2);
-                        });
-                    } else {
-                        let elementos = element2.ejecutar(entornoWhile, ast);
-                        if (name2 === "Print") {
-                            resultados.push(elementos);
                         }
                     }
-                });
-            } else {
+                    if (bandera == true || banderaContinue == true) {
+                        break;
+                    }
+                } else {
+                    let elementos = element2.ejecutar(entornoWhile, ast);
+                    if (name2 === "Print") {
+                        resultados.push(elementos);
+                    }
+                }
+            }
+            if (bandera == true) {
+                bandera = false;
                 break;
+            }
+            if (banderaContinue == true) {
+                banderaContinue = false;
+                continue;
             }
         }
         //IF
@@ -50,13 +80,18 @@ function actionGlobal(element, ent, ast) {
         if (element.condicion.getValorImplicito(entornoIf, ast)) {
             accionesIf.forEach(function(element2) {
                 let name2 = element2.constructor.name;
-                if (name2 !== "Print" && name2 !== "undefined") {
+                if (name2 == "Break") {
+                    resultados.push(element2);
+                } else if (name2 == "Continue") {
+                    resultados.push(element2);
+                } else if (name2 !== "Print" && name2 !== "undefined") {
                     let acciones = actionGlobal(element2, entornoIf, ast);
                     acciones.forEach(function(element2) {
                         resultados.push(element2);
                     });
                 } else {
                     let elementos = element2.ejecutar(entornoIf, ast);
+
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -89,5 +124,6 @@ function actionGlobal(element, ent, ast) {
             resultados.push(elementos);
         }
     }
+
     return resultados;
 }

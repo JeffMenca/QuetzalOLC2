@@ -34,6 +34,9 @@ BSL                                 "\\".
 "if"                  return 'if'
 "else"                return 'else'
 "while"               return 'while'
+"switch"              return 'switch'
+"break"               return 'break'
+"continue"            return 'continue'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -91,6 +94,8 @@ BSL                                 "\\".
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
     const {If} = require("../Instrucciones/If.js");
     const {While} = require("../Instrucciones/While.js");
+    const {Break} = require("../Instrucciones/Break.js");
+    const {Continue} = require("../Instrucciones/Continue.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
     const {Tipo} = require("../AST/Tipo.js");
@@ -131,6 +136,16 @@ INSTRUCCION:
     | ASIGNACION semicolon   { $$ = $1; }
     | IF                     { $$ = $1; }
     | WHILE                  { $$ = $1; }
+    | BREAK                  { $$ = $1; }
+    | CONTINUE               { $$ = $1; }
+;
+
+BREAK:
+    break semicolon             { $$ = new Break( @1.first_line, @1.first_column); }     
+;
+
+CONTINUE:
+    continue semicolon             { $$ = new Continue( @1.first_line, @1.first_column); }     
 ;
 
 IF:
@@ -142,6 +157,10 @@ IF:
 
 ELSE:
     else lllave LISTA_INSTRUCCIONES rllave      {$$ = $3;}
+;
+
+SWITCH: 
+    switch lparen identifier rparen lllave LISTA_CASE rllave 
 ;
 
 WHILE:
@@ -211,7 +230,7 @@ OP_LOGICAS:
 
 PRIMITIVA:
     IntegerLiteral                      { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
-    | DoubleLiteral                     { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
+    | DoubleLiteral                     { $$ = new Primitivo(Number($1), @1.first_line, @1.first_first_column); }
     | StringLiteral                     { $$ = new Primitivo($1.replace(/['"]+/g, ''), @1.first_line, @1.first_column); }
     | charliteral                       { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
     | null                              { $$ = new Primitivo(null, @1.first_line, @1.first_column); }
