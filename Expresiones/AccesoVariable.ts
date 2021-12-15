@@ -32,7 +32,7 @@ export class AccesoVariable implements Expresion {
             const simbolo: Simbolo = ent.getSimbolo(this.identificador);
             return simbolo.valor;
         }else{
-            console.error("error semantico en Acceso, no existe la variable" + this.linea + " y columna " + this.columna);
+            console.error("error semantico en Acceso, no existe la variable en linea " + this.linea + " y columna " + this.columna);
         }
     }
 

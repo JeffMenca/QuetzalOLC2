@@ -11,7 +11,7 @@ export class Asignacion implements Instruccion {
     public expresion: Expresion;
     public identificador: string;
 
-    constructor(identificador: string, exp:Expresion, tipo: Tipo, linea: number, columna: number) {
+    constructor(identificador: string, exp:Expresion, linea: number, columna: number) {
         this.identificador = identificador;
         this.expresion = exp;
         this.linea = linea;

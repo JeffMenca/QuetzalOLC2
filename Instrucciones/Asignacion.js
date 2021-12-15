@@ -2,7 +2,7 @@
 exports.__esModule = true;
 exports.Asignacion = void 0;
 var Asignacion = /** @class */ (function () {
-    function Asignacion(identificador, exp, tipo, linea, columna) {
+    function Asignacion(identificador, exp, linea, columna) {
         this.identificador = identificador;
         this.expresion = exp;
         this.linea = linea;

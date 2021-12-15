@@ -33,7 +33,11 @@ BSL                                 "\\".
 "false"               return 'false'
 "if"                  return 'if'
 "else"                return 'else'
+"do"                  return 'do'
 "while"               return 'while'
+"for"                 return 'for'
+"break"               return 'break'
+"continue"            return 'continue'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -91,6 +95,10 @@ BSL                                 "\\".
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
     const {If} = require("../Instrucciones/If.js");
     const {While} = require("../Instrucciones/While.js");
+    const {Dowhile} = require("../Instrucciones/Dowhile.js");
+    const {For} = require("../Instrucciones/For.js");
+    const {Break} = require("../Instrucciones/Break.js");
+    const {Continue} = require("../Instrucciones/Continue.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
     const {Tipo} = require("../AST/Tipo.js");
@@ -131,6 +139,10 @@ INSTRUCCION:
     | ASIGNACION semicolon   { $$ = $1; }
     | IF                     { $$ = $1; }
     | WHILE                  { $$ = $1; }
+    | DOWHILE semicolon      { $$ = $1; }
+    | FOR                    { $$ = $1; }
+    | BREAK semicolon        { $$ = $1; }
+    | CONTINUE semicolon     { $$ = $1; }
 ;
 
 IF:
@@ -145,12 +157,27 @@ ELSE:
 ;
 
 WHILE:
-    while lparen EXPR rparen INSTRUCCION { $$ = new While($3, [$5], @1.first_line, @1.first_column); } 
-    | while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
+    while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
+;
+
+DOWHILE:
+    do lllave LISTA_INSTRUCCIONES rllave while lparen EXPR rparen { $$ = new Dowhile($7, $3, @1.first_line, @1.first_column); } 
+;
+
+FOR:
+    for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier asign EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $15, $4, $3, $6, $12, $10, @1.first_line, @1.first_column); } 
+;
+
+BREAK:
+    break                               { $$ = new Break( @1.first_line, @1.first_column); }     
+;
+
+CONTINUE:
+    continue                            { $$ = new Continue( @1.first_line, @1.first_column); }     
 ;
 
 ASIGNACION:
-    identifier asign EXPR           { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
+    identifier asign EXPR               { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
 ;
 
 DECLARACION:

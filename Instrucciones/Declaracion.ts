@@ -33,7 +33,7 @@ export class Declaracion implements Instruccion {
                         const simbolo: Simbolo = new Simbolo(this.tipo,id,this.linea,this.columna,valor);
                         ent.agregar(id,simbolo);
                     }else{
-                        console.error("error semantico en declaracion no se permite asignar un valor diferente al declarado "+ this.linea+ " y columna "+ this.columna);
+                        console.error("error semantico en declaracion no se permite asignar un valor diferente al declarado en linea "+ this.linea+ " y columna "+ this.columna);
                     }
                 }else{
                     const simbolo: Simbolo = new Simbolo(this.tipo,id,this.linea,this.columna,this.getValorDefault());
