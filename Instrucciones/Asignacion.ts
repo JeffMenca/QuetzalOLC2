@@ -25,8 +25,14 @@ export class Asignacion implements Instruccion {
     ejecutar(ent: Entorno, arbol: AST) {
             if(ent.existe(this.identificador)){
                 const simbolo: Simbolo = ent.getSimbolo(this.identificador);
-                if(simbolo.getTipo(ent,arbol)==this.expresion.getTipo(ent,arbol)){
+                if(simbolo.getTipo(ent,arbol)==this.expresion.getTipo(ent,arbol) || this.expresion.getTipo(ent,arbol)==Tipo.NULL){
                     const valor = this.expresion.getValorImplicito(ent,arbol);
+                    simbolo.valor =valor;
+                    ent.reemplazar(this.identificador,simbolo);
+
+                } else if (simbolo.getTipo(ent,arbol) == Tipo.DOUBLE && this.expresion.getTipo(ent,arbol)==Tipo.INT) {
+                    const valor = this.expresion.getValorImplicito(ent,arbol);
+                    valor.toFixed(1);
                     simbolo.valor =valor;
                     ent.reemplazar(this.identificador,simbolo);
 

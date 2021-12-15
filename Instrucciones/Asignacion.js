@@ -1,6 +1,7 @@
 "use strict";
 exports.__esModule = true;
 exports.Asignacion = void 0;
+var Tipo_1 = require("../AST/Tipo");
 var Asignacion = /** @class */ (function () {
     function Asignacion(identificador, exp, linea, columna) {
         this.identificador = identificador;
@@ -14,8 +15,14 @@ var Asignacion = /** @class */ (function () {
     Asignacion.prototype.ejecutar = function (ent, arbol) {
         if (ent.existe(this.identificador)) {
             var simbolo = ent.getSimbolo(this.identificador);
-            if (simbolo.getTipo(ent, arbol) == this.expresion.getTipo(ent, arbol)) {
+            if (simbolo.getTipo(ent, arbol) == this.expresion.getTipo(ent, arbol) || this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.NULL) {
                 var valor = this.expresion.getValorImplicito(ent, arbol);
+                simbolo.valor = valor;
+                ent.reemplazar(this.identificador, simbolo);
+            }
+            else if (simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.DOUBLE && this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.INT) {
+                var valor = this.expresion.getValorImplicito(ent, arbol);
+                valor.toFixed(1);
                 simbolo.valor = valor;
                 ent.reemplazar(this.identificador, simbolo);
             }

@@ -25,12 +25,19 @@ var Declaracion = /** @class */ (function () {
                         var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, valor);
                         ent.agregar(id, simbolo);
                     }
+                    else if (_this.tipo == Tipo_1.Tipo.DOUBLE && _this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.INT) {
+                        var valor = _this.expresion.getValorImplicito(ent, arbol);
+                        valor.toFixed(1);
+                        var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, valor);
+                        ent.agregar(id, simbolo);
+                    }
                     else {
                         console.error("error semantico en declaracion no se permite asignar un valor diferente al declarado en linea " + _this.linea + " y columna " + _this.columna);
                     }
                 }
                 else {
-                    var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, _this.getValorDefault());
+                    console.log("entro aca");
+                    var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, null);
                     ent.agregar(id, simbolo);
                 }
             }
@@ -38,23 +45,6 @@ var Declaracion = /** @class */ (function () {
                 console.error("error semantico en declaracion no se permite declarar dos id con el mismo nombre en linea " + _this.linea + " y columna " + _this.columna);
             }
         });
-    };
-    Declaracion.prototype.getValorDefault = function () {
-        if (this.tipo == Tipo_1.Tipo.INT) {
-            return 0;
-        }
-        else if (this.tipo == Tipo_1.Tipo.DOUBLE) {
-            return 0.0;
-        }
-        else if (this.tipo == Tipo_1.Tipo.BOOL) {
-            return false;
-        }
-        else if (this.tipo == Tipo_1.Tipo.STRING) {
-            return "";
-        }
-        else {
-            return null;
-        }
     };
     return Declaracion;
 }());
