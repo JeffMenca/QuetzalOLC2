@@ -10,10 +10,14 @@ export class Asignacion implements Instruccion {
     columna: number;
     public expresion: Expresion;
     public identificador: string;
+    incremento: boolean;
+    decremento: boolean;
 
-    constructor(identificador: string, exp:Expresion, linea: number, columna: number) {
+    constructor(identificador: string, exp: Expresion, incremento: boolean, decremento: boolean, linea: number, columna: number) {
         this.identificador = identificador;
         this.expresion = exp;
+        this.incremento = incremento;
+        this.decremento = decremento;
         this.linea = linea;
         this.columna = columna;
     }
@@ -23,25 +27,80 @@ export class Asignacion implements Instruccion {
     }
 
     ejecutar(ent: Entorno, arbol: AST) {
-            if(ent.existe(this.identificador)){
-                const simbolo: Simbolo = ent.getSimbolo(this.identificador);
-                if(simbolo.getTipo(ent,arbol)==this.expresion.getTipo(ent,arbol) || this.expresion.getTipo(ent,arbol)==Tipo.NULL){
-                    const valor = this.expresion.getValorImplicito(ent,arbol);
-                    simbolo.valor =valor;
-                    ent.reemplazar(this.identificador,simbolo);
-
-                } else if (simbolo.getTipo(ent,arbol) == Tipo.DOUBLE && this.expresion.getTipo(ent,arbol)==Tipo.INT) {
-                    const valor = this.expresion.getValorImplicito(ent,arbol);
-                    valor.toFixed(1);
-                    simbolo.valor =valor;
-                    ent.reemplazar(this.identificador,simbolo);
-
-                }else{
-                    console.error("error semantico en asignacion no se puede asignar un valor diferente al de la varianble en linea "+ this.linea+ " y columna "+ this.columna);
-                }
-            }else{
-                console.error("error semantico en asignacion no existe la variable en linea "+ this.linea+ " y columna "+ this.columna);
+        if (ent.existe(this.identificador)) {
+            const simbolo: Simbolo = ent.getSimbolo(this.identificador);
+            if ((simbolo.getTipo(ent, arbol) == Tipo.INT && this.incremento == true)|| (simbolo.getTipo(ent, arbol) == Tipo.DOUBLE && this.incremento == true)) {
+                simbolo.valor = simbolo.valor + 1;
+                ent.reemplazar(this.identificador, simbolo);
+                this.incremento = false;
+                return simbolo.valor;
+            } else if ((simbolo.getTipo(ent, arbol) == Tipo.INT && this.decremento == true) || (simbolo.getTipo(ent, arbol) == Tipo.DOUBLE && this.decremento == true)) {
+                simbolo.valor = simbolo.valor - 1;
+                ent.reemplazar(this.identificador, simbolo);
+                this.decremento = false;
+                return simbolo.valor;
+            } else if (simbolo.getTipo(ent, arbol) == this.expresion.getTipo(ent, arbol) || this.expresion.getTipo(ent, arbol) == Tipo.NULL) {
+                const valor = this.expresion.getValorImplicito(ent, arbol);
+                simbolo.valor = valor;
+                ent.reemplazar(this.identificador, simbolo);
+            } else if (simbolo.getTipo(ent, arbol) == Tipo.DOUBLE && this.expresion.getTipo(ent, arbol) == Tipo.INT) {
+                const valor = this.expresion.getValorImplicito(ent, arbol);
+                valor.toFixed(1);
+                simbolo.valor = valor;
+                ent.reemplazar(this.identificador, simbolo);
+            } else {
+                console.error("error semantico en asignacion no se puede asignar un valor diferente al de la varianble en linea " + this.linea + " y columna " + this.columna);
             }
+        } else {
+            console.error("error semantico en asignacion no existe la variable en linea " + this.linea + " y columna " + this.columna);
+        }
+    }
+
+    getValorImplicito(ent: Entorno, arbol: AST) {
+        if (this.incremento == true) {
+            const simbolo: Simbolo = ent.getSimbolo(this.identificador);
+            let anterior = simbolo.valor;
+            simbolo.valor = simbolo.valor + 1;
+            ent.reemplazar(this.identificador, simbolo);
+            return anterior;
+        } else if (this.decremento == true) {
+            const simbolo: Simbolo = ent.getSimbolo(this.identificador);
+            let anterior = simbolo.valor;
+            simbolo.valor = simbolo.valor - 1;
+            ent.reemplazar(this.identificador, simbolo);
+            return anterior;
+        }
+
+
+    }
+
+    getTipo(ent: Entorno, arbol: AST): Tipo {
+        const simbolo: Simbolo = ent.getSimbolo(this.identificador);
+        const valor = simbolo.valor;
+        if (typeof(valor) === 'boolean')
+        {
+            return Tipo.BOOL;
+        }
+        else if (typeof(valor) === 'string')
+        {
+            return Tipo.STRING;
+        }
+        else if (typeof(valor) === 'number')
+        {
+            if(this.isInt(Number(valor))){
+                return Tipo.INT;
+            }
+           return Tipo.DOUBLE;
+        }
+        else if(valor === null){
+            return Tipo.NULL;
+        }
+            
+        return Tipo.VOID;
+    }
+
+    isInt(n:number){
+        return Number(n) === n && n % 1 === 0;
     }
 
 }

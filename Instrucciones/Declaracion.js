@@ -36,7 +36,6 @@ var Declaracion = /** @class */ (function () {
                     }
                 }
                 else {
-                    console.log("entro aca");
                     var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, null);
                     ent.agregar(id, simbolo);
                 }

@@ -38,6 +38,8 @@ BSL                                 "\\".
 "for"                 return 'for'
 "break"               return 'break'
 "continue"            return 'continue'
+"void"                return 'void'
+"main"                return 'main'
 
 
 /* COMENTARIOS Y ESPACIOS */
@@ -58,6 +60,8 @@ BSL                                 "\\".
 /* OPERADORES, LOGICAS Y RELACIONALES  */
 "*"                   return 'multi'
 "/"                   return 'div'
+"++"                  return 'plusdouble'
+"--"                  return 'minusdouble'
 "-"                   return 'minus'
 "+"                   return 'plus'
 "^"                   return 'pot'
@@ -92,6 +96,7 @@ BSL                                 "\\".
 
 /* IMPORTS  */
 %{
+    const {Main} = require("../Instrucciones/Main.js");
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
     const {If} = require("../Instrucciones/If.js");
     const {While} = require("../Instrucciones/While.js");
@@ -126,8 +131,17 @@ BSL                                 "\\".
 
 %% /* GRAMATICA*/
 
-START : LISTA_INSTRUCCIONES EOF         { $$ = $1; return $$; }
+START : GLOBAL EOF         { $$ = $1; return $$; }
     ;
+ 
+GLOBAL: 
+    GLOBAL INSTRUCCIONGLOBAL { $1.push($2); $$ = $1; }
+    | INSTRUCCIONGLOBAL { $$ = [$1]; } 
+;
+
+MAIN:
+    void main lparen rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new Main($6, @1.first_line, @1.first_column); } 
+;
 
 LISTA_INSTRUCCIONES: 
     LISTA_INSTRUCCIONES INSTRUCCION { $1.push($2); $$ = $1; }
@@ -143,6 +157,13 @@ INSTRUCCION:
     | FOR                    { $$ = $1; }
     | BREAK semicolon        { $$ = $1; }
     | CONTINUE semicolon     { $$ = $1; }
+    | INCREMENTO semicolon   { $$ = $1; }
+;
+
+INSTRUCCIONGLOBAL:
+    DECLARACION semicolon    { $$ = $1; }
+    | ASIGNACION semicolon   { $$ = $1; }
+    | MAIN                   { $$ = $1; }
 ;
 
 IF:
@@ -165,7 +186,9 @@ DOWHILE:
 ;
 
 FOR:
-    for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier asign EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $15, $4, $3, $6, $12, $10, @1.first_line, @1.first_column); } 
+    for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier asign EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $15, $4, $3, $6, $12, $10,false,false, @1.first_line, @1.first_column); }
+    | for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier plusdouble rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $14, $4, $3, $6, $10, $10,true,false, @1.first_line, @1.first_column); }
+    | for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier minusdouble rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $14, $4, $3, $6, $10, $10,false,true, @1.first_line, @1.first_column); }
 ;
 
 BREAK:
@@ -177,7 +200,12 @@ CONTINUE:
 ;
 
 ASIGNACION:
-    identifier asign EXPR               { $$ = new Asignacion($1, $3, @1.first_line, @1.first_column); } 
+    identifier asign EXPR               { $$ = new Asignacion($1, $3,false,false, @1.first_line, @1.first_column); }
+;
+
+INCREMENTO:
+    identifier plusdouble               { $$ = new Asignacion($1,$1 ,true,false, @1.first_line, @1.first_column); }
+    | identifier minusdouble            { $$ = new Asignacion($1,$1 ,false,true, @1.first_line, @1.first_column); }
 ;
 
 DECLARACION:
@@ -204,6 +232,7 @@ EXPR:
     | OP_ARITMETICAS                    { $$ = $1 }
     | OP_RELACIONALES                   { $$ = $1 }
     | OP_LOGICAS                        { $$ = $1 }
+    | INCREMENTO                        { $$ = $1 }
 ;
 
 

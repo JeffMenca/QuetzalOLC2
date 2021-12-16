@@ -9,13 +9,22 @@ if (typeof window !== 'undefined') {
         const instrucciones = grammar.parse(input);
         const ast = new AST.AST(instrucciones);
         const entornoGlobal = new Entorno.Entorno(null);
+        let banderaMain = 0;
         let acciones = [];
-        instrucciones.forEach(function(element) {
-            let accionesSecundarias = actionGlobal(element, entornoGlobal, ast);
-            accionesSecundarias.forEach(function(element2) {
-                acciones.push(element2);
-            });
-        });
+        for (let element of instrucciones) {
+            if (element.constructor.name == "Main") {
+                banderaMain = banderaMain + 1;
+            }
+            if (banderaMain <= 1) {
+                let accionesSecundarias = actionGlobal(element, entornoGlobal, ast);
+                accionesSecundarias.forEach(function(element2) {
+                    acciones.push(element2);
+                });
+            } else {
+                acciones.push("Error, existe mas de 1 metodo Main");
+                break;
+            }
+        }
         return acciones;
     }
 }
@@ -25,8 +34,26 @@ function actionGlobal(element, ent, ast) {
     let resultados = [];
     let bandera = false;
     let banderaContinue = false;
-    //WHILE
-    if (name == "While") {
+    //MAIN
+    if (name == "Main") {
+        let entornoMain = new Entorno.Entorno(ent);
+        let accionesMain = element.ejecutar(entornoMain, ast);
+        for (let element2 of accionesMain) {
+            let name2 = element2.constructor.name;
+            if (name2 !== "Print" && name2 !== "undefined") {
+                let acciones = actionGlobal(element2, entornoMain, ast);
+                for (let element2 of acciones) {
+                    resultados.push(element2);
+                }
+            } else {
+                let elementos = element2.ejecutar(entornoMain, ast);
+                if (name2 === "Print") {
+                    resultados.push(elementos);
+                }
+            }
+        }
+        //WHILE
+    } else if (name == "While") {
         let entornoWhile = new Entorno.Entorno(ent);
         while (element.condicion.getValorImplicito(entornoWhile, ast)) {
             entornoWhile = new Entorno.Entorno(ent);

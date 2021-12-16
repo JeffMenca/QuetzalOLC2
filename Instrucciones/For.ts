@@ -16,8 +16,10 @@ export class For implements Instruccion {
     public tipo: Tipo;
     public expresionDeclaracion: Expresion;
     public expresionAsignacion: Expresion;
+    incremento: boolean;
+    decremento: boolean;
 
-    constructor(condicion: Expresion, lista_instrucciones_for: Array<Instruccion>, identificador: string, tipo: Tipo, expresionDeclaracion: Expresion, expresionAsignacion: Expresion,identificador2: string, linea: number, columna: number) {
+    constructor(condicion: Expresion, lista_instrucciones_for: Array<Instruccion>, identificador: string, tipo: Tipo, expresionDeclaracion: Expresion, expresionAsignacion: Expresion, identificador2: string, incremento: boolean, decremento: boolean, linea: number, columna: number) {
         this.condicion = condicion;
         this.lista_instrucciones_for = lista_instrucciones_for;
         this.identificador = identificador;
@@ -25,6 +27,8 @@ export class For implements Instruccion {
         this.expresionDeclaracion = expresionDeclaracion;
         this.expresionAsignacion = expresionAsignacion;
         this.identificador2 = identificador2;
+        this.incremento = incremento;
+        this.decremento = decremento;
         this.linea = linea;
         this.columna = columna;
     }
@@ -42,7 +46,7 @@ export class For implements Instruccion {
         declaracion.ejecutar(ent, arbol);
     }
     ejecutarAsignacion(ent: Entorno, arbol: AST) {
-        let asignacion = new Asignacion(this.identificador2, this.expresionAsignacion, this.linea, this.columna);
+        let asignacion = new Asignacion(this.identificador2, this.expresionAsignacion, this.incremento, this.decremento, this.linea, this.columna);
         asignacion.ejecutar(ent, arbol);
     }
 
