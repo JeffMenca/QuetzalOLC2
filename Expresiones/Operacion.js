@@ -24,7 +24,9 @@ var Operador;
     Operador[Operador["SENO"] = 17] = "SENO";
     Operador[Operador["COSENO"] = 18] = "COSENO";
     Operador[Operador["TAN"] = 19] = "TAN";
-    Operador[Operador["DESCONOCIDO"] = 20] = "DESCONOCIDO";
+    Operador[Operador["CONCAT"] = 20] = "CONCAT";
+    Operador[Operador["POT"] = 21] = "POT";
+    Operador[Operador["DESCONOCIDO"] = 22] = "DESCONOCIDO";
 })(Operador = exports.Operador || (exports.Operador = {}));
 var Operacion = /** @class */ (function () {
     function Operacion(op_izquierda, op_derecha, operacion, linea, columna) {
@@ -245,6 +247,26 @@ var Operacion = /** @class */ (function () {
                 }
                 else {
                     console.log("Error de tipos de datos no permitidos realizando tangente");
+                    return null;
+                }
+            }
+            //CONCATENAR
+            else if (this.operador == Operador.CONCAT) {
+                if (typeof (op1 === "string") && typeof (op2 === "string")) {
+                    return op1 + op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando concatenacion");
+                    return null;
+                }
+            }
+            //REPEAT
+            else if (this.operador == Operador.POT) {
+                if (typeof (op1 === "string") && typeof (op2 === "number")) {
+                    return op1.repeat(op2);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando concatenacion");
                     return null;
                 }
             }

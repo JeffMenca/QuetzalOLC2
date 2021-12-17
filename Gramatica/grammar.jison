@@ -40,7 +40,12 @@ BSL                                 "\\".
 "continue"            return 'continue'
 "void"                return 'void'
 "main"                return 'main'
-
+"caracterOfPosition"  return 'cop'
+"subString"           return 'substring'
+"length"              return 'length'
+"toUpperCase"         return 'mayus'
+"toLowerCase"         return 'lower'
+"in"                  return 'in'
 
 /* COMENTARIOS Y ESPACIOS */
 [/][*][^]*[*][/]      /* Comentario multiple */
@@ -81,6 +86,7 @@ BSL                                 "\\".
 ";"                   return 'semicolon'
 ":"                   return 'dosp'
 "?"                   return 'quest'
+"."                   return 'dot'
 "{"                   return 'lllave'
 "}"                   return 'rllave'
 "&"                   return 'amp'
@@ -98,6 +104,11 @@ BSL                                 "\\".
 %{
     const {Main} = require("../Instrucciones/Main.js");
     const {Print} = require("../Instrucciones/Primitivas/Print.js");
+    const {Acceso} = require("../Instrucciones/CadenaNativas/Acceso.js");
+    const {AccesoPorcion} = require("../Instrucciones/CadenaNativas/AccesoPorcion.js");
+    const {Length} = require("../Instrucciones/CadenaNativas/Length.js");
+    const {Mayuscula} = require("../Instrucciones/CadenaNativas/Mayuscula.js");
+    const {Minuscula} = require("../Instrucciones/CadenaNativas/Minuscula.js");
     const {If} = require("../Instrucciones/If.js");
     const {While} = require("../Instrucciones/While.js");
     const {Dowhile} = require("../Instrucciones/Dowhile.js");
@@ -112,6 +123,7 @@ BSL                                 "\\".
     const {Objeto} = require("../Expresiones/Objeto.js");
     const {Atributo} = require("../Expresiones/Atributo.js");
     const {AccesoVariable} = require("../Expresiones/AccesoVariable.js");
+    const {Forin} = require("../Instrucciones/Forin.js");
 %}
 
 /* PRECEDENCIA */
@@ -189,6 +201,8 @@ FOR:
     for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier asign EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $15, $4, $3, $6, $12, $10,false,false, @1.first_line, @1.first_column); }
     | for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier plusdouble rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $14, $4, $3, $6, $10, $10,true,false, @1.first_line, @1.first_column); }
     | for lparen TIPO identifier asign EXPR semicolon EXPR semicolon identifier minusdouble rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new For($8, $14, $4, $3, $6, $10, $10,false,true, @1.first_line, @1.first_column); }
+    | for identifier in StringLiteral lllave LISTA_INSTRUCCIONES rllave  { $$ = new Forin($6, $2, $4.replace(/['"]+/g, ''), true, @1.first_line, @1.first_column); }
+    | for identifier in identifier lllave LISTA_INSTRUCCIONES rllave    { $$ = new Forin($6, $2, $4, false, @1.first_line, @1.first_column); }
 ;
 
 BREAK:
@@ -197,6 +211,16 @@ BREAK:
 
 CONTINUE:
     continue                            { $$ = new Continue( @1.first_line, @1.first_column); }     
+;
+
+CADENAS:
+    EXPR amp EXPR                                                                   { $$ = new Operacion($1,$3,Operador.CONCAT, @1.first_line, @1.first_column); }
+    | EXPR pot EXPR                                                                 { $$ = new Operacion($1,$3,Operador.POT, @1.first_line, @1.first_column); }
+    | identifier dot cop lparen IntegerLiteral rparen                               { $$ = new Acceso($1, Number($5), @1.first_line, @1.first_column); }
+    | identifier dot substring lparen IntegerLiteral coma IntegerLiteral rparen     { $$ = new AccesoPorcion($1, Number($5),Number($7), @1.first_line, @1.first_column); }
+    | identifier dot length lparen rparen                                           { $$ = new Length($1, @1.first_line, @1.first_column); }
+    | identifier dot mayus lparen rparen                                            { $$ = new Mayuscula($1, @1.first_line, @1.first_column); }
+    | identifier dot lower lparen rparen                                            { $$ = new Minuscula($1, @1.first_line, @1.first_column); }
 ;
 
 ASIGNACION:
@@ -228,11 +252,13 @@ TIPO:
 ;
 
 EXPR:
+      
     PRIMITIVA                           { $$ = $1 }
     | OP_ARITMETICAS                    { $$ = $1 }
     | OP_RELACIONALES                   { $$ = $1 }
     | OP_LOGICAS                        { $$ = $1 }
     | INCREMENTO                        { $$ = $1 }
+    | CADENAS                           { $$ = $1 }
 ;
 
 

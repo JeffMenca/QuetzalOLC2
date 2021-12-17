@@ -3,6 +3,7 @@ let AST = require("../AST/AST.js")
 let Entorno = require("../AST/Entorno.js")
 let Instruccion = require("../Interfaces/Instruccion.js")
 let Print = require("../Instrucciones/Primitivas/Print.js")
+let Primitivo = require("../Expresiones/Primitivo.js")
 
 if (typeof window !== 'undefined') {
     window.parseGrammar = function(input) {
@@ -228,6 +229,66 @@ function actionGlobal(element, ent, ast) {
                     }
                 } else {
                     let elementos = element2.ejecutar(entornoForAcciones, ast);
+                    if (name2 === "Print") {
+                        resultados.push(elementos);
+                    }
+                }
+            }
+            if (bandera == true) {
+                bandera = false;
+                break;
+            }
+            if (banderaContinue == true) {
+                banderaContinue = false;
+                continue;
+            }
+        }
+        //PRINTS Y ELEMENTOS
+    } else if (name == "Forin") {
+        const entornoForin = new Entorno.Entorno(ent);
+        let entornoForinAcciones = new Entorno.Entorno(entornoForin);
+        element.ejecutarDeclaracion(entornoForin, ast);
+        let cadena;
+        if (element.isString == true) {
+            cadena = element.identificador2;
+        } else {
+            if (entornoForin.existe(element.identificador2)) {
+                let simbolo = entornoForin.getSimbolo(element.identificador2);
+                cadena = simbolo.valor;
+            }
+        }
+        for (let i = 0; i < cadena.length; i++) {
+            entornoForinAcciones = new Entorno.Entorno(entornoForin);
+            element.ejecutarAsignacion(entornoForin, ast, new Primitivo.Primitivo(cadena.charAt(i)));
+            let accionesForin = element.ejecutar(entornoForinAcciones, ast);
+            for (let element2 of accionesForin) {
+                let name2 = element2.constructor.name;
+                if (name2 == "Break") {
+                    bandera = true;
+                    break;
+                }
+                if (name2 == "Continue") {
+                    banderaContinue = true;
+                    break;
+                }
+                if (name2 !== "Print" && name2 !== "undefined") {
+                    let acciones = actionGlobal(element2, entornoForinAcciones, ast);
+                    for (let element2 of acciones) {
+                        if (element2.constructor.name == "Break") {
+                            bandera = true;
+                            break;
+                        } else if (element2.constructor.name == "Continue") {
+                            banderaContinue = true;
+                            break;
+                        } else {
+                            resultados.push(element2);
+                        }
+                    }
+                    if (bandera == true || banderaContinue == true) {
+                        break;
+                    }
+                } else {
+                    let elementos = element2.ejecutar(entornoForinAcciones, ast);
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }

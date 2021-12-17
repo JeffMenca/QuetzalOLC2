@@ -24,6 +24,8 @@ export enum Operador {
     SENO,
     COSENO,
     TAN,
+    CONCAT,
+    POT,
     DESCONOCIDO
 }
 
@@ -260,7 +262,26 @@ export class Operacion implements Expresion {
                     return null;
                 }
             }
-
+            //CONCATENAR
+            else if (this.operador == Operador.CONCAT) {
+                if (typeof (op1 === "string") && typeof (op2 === "string")) {
+                    return op1 + op2;
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando concatenacion");
+                    return null;
+                }
+            }
+             //REPEAT
+             else if (this.operador == Operador.POT) {
+                if (typeof (op1 === "string") && typeof (op2 === "number")) {
+                    return op1.repeat(op2);
+                }
+                else {
+                    console.log("Error de tipos de datos no permitidos realizando concatenacion");
+                    return null;
+                }
+            }
 
         } else {
             let op1 = this.op_izquierda.getValorImplicito(ent, arbol);
