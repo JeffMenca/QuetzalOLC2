@@ -20,13 +20,11 @@ var Asignacion = /** @class */ (function () {
             if ((simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.INT && this.incremento == true) || (simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.DOUBLE && this.incremento == true)) {
                 simbolo.valor = simbolo.valor + 1;
                 ent.reemplazar(this.identificador, simbolo);
-                this.incremento = false;
                 return simbolo.valor;
             }
             else if ((simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.INT && this.decremento == true) || (simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.DOUBLE && this.decremento == true)) {
                 simbolo.valor = simbolo.valor - 1;
                 ent.reemplazar(this.identificador, simbolo);
-                this.decremento = false;
                 return simbolo.valor;
             }
             else if (simbolo.getTipo(ent, arbol) == this.expresion.getTipo(ent, arbol) || this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.NULL) {

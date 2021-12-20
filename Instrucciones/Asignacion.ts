@@ -32,12 +32,10 @@ export class Asignacion implements Instruccion {
             if ((simbolo.getTipo(ent, arbol) == Tipo.INT && this.incremento == true)|| (simbolo.getTipo(ent, arbol) == Tipo.DOUBLE && this.incremento == true)) {
                 simbolo.valor = simbolo.valor + 1;
                 ent.reemplazar(this.identificador, simbolo);
-                this.incremento = false;
                 return simbolo.valor;
             } else if ((simbolo.getTipo(ent, arbol) == Tipo.INT && this.decremento == true) || (simbolo.getTipo(ent, arbol) == Tipo.DOUBLE && this.decremento == true)) {
                 simbolo.valor = simbolo.valor - 1;
                 ent.reemplazar(this.identificador, simbolo);
-                this.decremento = false;
                 return simbolo.valor;
             } else if (simbolo.getTipo(ent, arbol) == this.expresion.getTipo(ent, arbol) || this.expresion.getTipo(ent, arbol) == Tipo.NULL) {
                 const valor = this.expresion.getValorImplicito(ent, arbol);
