@@ -7,6 +7,18 @@ var AST = /** @class */ (function () {
         this.structs = [];
         this.funciones = [];
     }
+    AST.prototype.addFuncion = function (funcion) {
+        this.funciones.push(funcion);
+    };
+    AST.prototype.getFuncion = function (name) {
+        for (var i in this.funciones) {
+            var funcion = this.funciones[i];
+            if (funcion.getNombre() === name) {
+                return funcion;
+            }
+        }
+        return null;
+    };
     return AST;
 }());
 exports.AST = AST;

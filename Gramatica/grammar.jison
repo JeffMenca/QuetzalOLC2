@@ -53,6 +53,8 @@ BSL                                 "\\".
 "switch"              return 'switch'
 "case"                return 'case'
 "default"             return 'default'
+"return"              return 'return'
+
 
 /* COMENTARIOS Y ESPACIOS */
 [/][*][^]*[*][/]      /* Comentario multiple */
@@ -139,6 +141,8 @@ BSL                                 "\\".
     const {Atributo} = require("../Expresiones/Atributo.js");
     const {AccesoVariable} = require("../Expresiones/AccesoVariable.js");
     const {Forin} = require("../Instrucciones/Forin.js");
+    const {Funcion} = require("../Instrucciones/Funcion.js");
+    const {AccesoFuncion} = require("../Instrucciones/AccesoFuncion.js");
 %}
 
 /* PRECEDENCIA */
@@ -176,23 +180,25 @@ LISTA_INSTRUCCIONES:
     | INSTRUCCION { $$ = [$1]; } ;
 
 INSTRUCCION:
-    PRINT semicolon          { $$ = $1; }
-    | DECLARACION semicolon  { $$ = $1; }
-    | ASIGNACION semicolon   { $$ = $1; }
-    | IF                     { $$ = $1; }
-    | WHILE                  { $$ = $1; }
-    | DOWHILE semicolon      { $$ = $1; }
-    | FOR                    { $$ = $1; }
-    | BREAK semicolon        { $$ = $1; }
-    | CONTINUE semicolon     { $$ = $1; }
-    | INCREMENTO semicolon   { $$ = $1; }
-    | SWITCH                 { $$ = $1; }
+    PRINT semicolon           { $$ = $1; }
+    | DECLARACION semicolon   { $$ = $1; }
+    | ASIGNACION semicolon    { $$ = $1; }
+    | IF                      { $$ = $1; }
+    | WHILE                   { $$ = $1; }
+    | DOWHILE semicolon       { $$ = $1; }
+    | FOR                     { $$ = $1; }
+    | BREAK semicolon         { $$ = $1; }
+    | CONTINUE semicolon      { $$ = $1; }
+    | INCREMENTO semicolon    { $$ = $1; }
+    | SWITCH                  { $$ = $1; }
+    | ACCESOFUNCION semicolon { $$ = $1; }
 ;
 
 INSTRUCCIONGLOBAL:
     DECLARACION semicolon    { $$ = $1; }
     | ASIGNACION semicolon   { $$ = $1; }
     | MAIN                   { $$ = $1; }
+    | FUNCION                { $$ = $1; }
 ;
 
 IF:
@@ -209,8 +215,6 @@ ELSE:
 TERNARIO:
     EXPR quest EXPR dosp EXPR                                           {$$ = new Ternario($1, $3, $5, @1.first_line, @1.first_column);} 
 ;
-
-
 
 WHILE:
     while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
@@ -294,6 +298,34 @@ DEFAULT:
     default dosp LISTA_INSTRUCCIONES { $$ = new Case($1,$3,@1.first_line, @1.first_column); }
 ;
 
+FUNCION:
+    void identifier lparen rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new Funcion($2, [],$6,Tipo.VOID, @1.first_line, @1.first_column); } 
+    | void identifier lparen LISTA_PARAMETROS rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new Funcion($2, $4,$7,Tipo.VOID, @1.first_line, @1.first_column); } 
+    | TIPO identifier lparen LISTA_PARAMETROS rparen lllave LISTA_INSTRUCCIONES return EXPR semicolon rllave { $$ = new Funcion($2, $4,$7,$1, @1.first_line, @1.first_column,$9); } 
+    | TIPO identifier lparen rparen lllave LISTA_INSTRUCCIONES return EXPR semicolon rllave { $$ = new Funcion($2, [],$6,$1, @1.first_line, @1.first_column,$8); } 
+;
+
+LISTA_PARAMETROS: LISTA_PARAMETROS coma PARAMETRO    { $1.push($3); $$ = $1; } 
+        | PARAMETRO { $$ = [$1]; } 
+;
+
+PARAMETRO:
+    TIPO identifier { $$ = new Declaracion([$2],$1, @1.first_line, @1.first_column); }
+;
+
+ACCESOFUNCION:
+     identifier lparen rparen { $$ = new AccesoFuncion($1, [],@1.first_line, @1.first_column); } 
+     | identifier lparen LISTA_PARAMETROS_ACCESO rparen { $$ = new AccesoFuncion($1, $3,@1.first_line, @1.first_column); }
+;
+
+LISTA_PARAMETROS_ACCESO: LISTA_PARAMETROS_ACCESO coma PARAMETRO_ACCESO    { $1.push($3); $$ = $1; } 
+        | PARAMETRO_ACCESO { $$ = [$1]; } 
+;
+
+PARAMETRO_ACCESO:
+    EXPR  { $$ = $1; }
+;
+
 TIPO:
     int                 { $$ = Tipo.INT; }
     | double            { $$  = Tipo.DOUBLE; }
@@ -304,14 +336,15 @@ TIPO:
 
 EXPR:
       
-    PRIMITIVA                           { $$ = $1 }
-    | OP_ARITMETICAS                    { $$ = $1 }
-    | OP_RELACIONALES                   { $$ = $1 }
-    | OP_LOGICAS                        { $$ = $1 }
-    | INCREMENTO                        { $$ = $1 }
-    | CADENAS                           { $$ = $1 }
-    | TERNARIO                          { $$ = $1 }
-    | NATIVAS                           { $$ = $1 }
+    PRIMITIVA                           { $$ = $1; }
+    | OP_ARITMETICAS                    { $$ = $1; }
+    | OP_RELACIONALES                   { $$ = $1; }
+    | OP_LOGICAS                        { $$ = $1; }
+    | INCREMENTO                        { $$ = $1; }
+    | CADENAS                           { $$ = $1; }
+    | TERNARIO                          { $$ = $1; }
+    | NATIVAS                           { $$ = $1; }
+    | ACCESOFUNCION                     { $$ = $1; }
 ;
 
 OP_ARITMETICAS:

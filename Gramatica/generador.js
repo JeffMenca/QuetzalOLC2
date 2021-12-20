@@ -4,6 +4,8 @@ let Entorno = require("../AST/Entorno.js")
 let Instruccion = require("../Interfaces/Instruccion.js")
 let Print = require("../Instrucciones/Primitivas/Print.js")
 let Primitivo = require("../Expresiones/Primitivo.js")
+let Tipo = require("../AST/Tipo.js");
+let acciones = [];
 
 if (typeof window !== 'undefined') {
     window.parseGrammar = function(input) {
@@ -11,10 +13,13 @@ if (typeof window !== 'undefined') {
         const ast = new AST.AST(instrucciones);
         const entornoGlobal = new Entorno.Entorno(null);
         let banderaMain = 0;
-        let acciones = [];
+        let main;
+        //Se realizan acciones de lo global
         for (let element of instrucciones) {
             if (element.constructor.name == "Main") {
                 banderaMain = banderaMain + 1;
+                main = element;
+                continue;
             }
             if (banderaMain <= 1) {
                 let accionesSecundarias = actionGlobal(element, entornoGlobal, ast);
@@ -25,6 +30,13 @@ if (typeof window !== 'undefined') {
                 acciones.push("Error, existe mas de 1 metodo Main");
                 break;
             }
+        }
+        //Se realizan acciones del main
+        if (banderaMain == 1) {
+            let accionesSecundarias = actionGlobal(main, entornoGlobal, ast);
+            accionesSecundarias.forEach(function(element2) {
+                acciones.push(element2);
+            });
         }
         return acciones;
     }
@@ -48,6 +60,17 @@ function actionGlobal(element, ent, ast) {
                 }
             } else {
                 let elementos = element2.ejecutar(entornoMain, ast);
+                if (element2.expresion != null) {
+                    if (element2.expresion.getTipo(ent, ast) == 4) {
+                        let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                        for (let element3 of accionesVoid) {
+                            let accionesSecundarias = actionGlobal(element3, ent, ast);
+                            accionesSecundarias.forEach(function(element4) {
+                                resultados.push(element4);
+                            });
+                        }
+                    }
+                }
                 if (name2 === "Print") {
                     resultados.push(elementos);
                 }
@@ -118,6 +141,17 @@ function actionGlobal(element, ent, ast) {
                     });
                 } else {
                     let elementos = element2.ejecutar(entornoIf, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -138,6 +172,17 @@ function actionGlobal(element, ent, ast) {
                         });
                     } else {
                         let elementos = element2.ejecutar(entornoElse, ast);
+                        if (element2.expresion != null) {
+                            if (element2.expresion.getTipo(ent, ast) == 4) {
+                                let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                                for (let element3 of accionesVoid) {
+                                    let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                    accionesSecundarias.forEach(function(element4) {
+                                        resultados.push(element4);
+                                    });
+                                }
+                            }
+                        }
                         if (name2 === "Print") {
                             resultados.push(elementos);
                         }
@@ -178,6 +223,17 @@ function actionGlobal(element, ent, ast) {
                     }
                 } else {
                     let elementos = element2.ejecutar(entornoDowhile, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -229,6 +285,17 @@ function actionGlobal(element, ent, ast) {
                     }
                 } else {
                     let elementos = element2.ejecutar(entornoForAcciones, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -289,6 +356,17 @@ function actionGlobal(element, ent, ast) {
                     }
                 } else {
                     let elementos = element2.ejecutar(entornoForinAcciones, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -303,7 +381,7 @@ function actionGlobal(element, ent, ast) {
                 continue;
             }
         }
-        //PRINTS Y ELEMENTOS
+        //SWITCH
     } else if (name == "Switch") {
         const entornoSwitch = new Entorno.Entorno(ent);
         let accionesSwitch = element.ejecutar(entornoSwitch, ast);
@@ -324,6 +402,17 @@ function actionGlobal(element, ent, ast) {
                     });
                 } else {
                     let elementos = element2.ejecutar(entornoSwitch, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -331,8 +420,52 @@ function actionGlobal(element, ent, ast) {
             }
         }
 
+    } else if (name == "AccesoFuncion") {
+        let accionesFuncion = element.ejecutar(ent, ast);
+        let entornoFuncion = element.entornoFuncion;
+        if (accionesFuncion != null) {
+            for (let element2 of accionesFuncion) {
+                let name2 = element2.constructor.name;
+                if (name2 !== "Print" && name2 !== "undefined") {
+                    let acciones = actionGlobal(element2, entornoFuncion, ast);
+                    for (let element2 of acciones) {
+                        resultados.push(element2);
+                    }
+                } else {
+                    let elementos = element2.ejecutar(entornoFuncion, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    resultados.push(element4);
+                                });
+                            }
+                        }
+                    }
+                    if (name2 === "Print") {
+                        resultados.push(elementos);
+                    }
+                }
+            }
+        }
+        //PRINTS Y ELEMENTOS
     } else {
         let elementos = element.ejecutar(ent, ast);
+        if (name != "Funcion") {
+            if (element.expresion != null) {
+                if (element.expresion.getTipo(ent, ast) == 4) {
+                    let accionesVoid = element.expresion.ejecutar(ent, ast);
+                    for (let element3 of accionesVoid) {
+                        let accionesSecundarias = actionGlobal(element3, ent, ast);
+                        accionesSecundarias.forEach(function(element4) {
+                            resultados.push(element4);
+                        });
+                    }
+                }
+            }
+        }
         //PRINTS
         if (name === "Print") {
             resultados.push(elementos);

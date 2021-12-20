@@ -32,6 +32,16 @@ var Asignacion = /** @class */ (function () {
                 simbolo.valor = valor;
                 ent.reemplazar(this.identificador, simbolo);
             }
+            else if (this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.VOID) {
+                if (simbolo.getTipo(ent, arbol) == this.getTipoExpresion(ent, arbol)) {
+                    var valor = this.expresion.getValorImplicito(ent, arbol);
+                    simbolo.valor = valor;
+                    ent.reemplazar(this.identificador, simbolo);
+                }
+                else {
+                    console.error("error semantico en asignacion no se puede asignar un valor diferente al de la varianble en linea " + this.linea + " y columna " + this.columna);
+                }
+            }
             else if (simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.DOUBLE && this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.INT) {
                 var valor = this.expresion.getValorImplicito(ent, arbol);
                 valor.toFixed(1);
@@ -75,6 +85,28 @@ var Asignacion = /** @class */ (function () {
         }
         else if (typeof (valor) === 'string') {
             if (this.isChar(valor)) {
+                return Tipo_1.Tipo.CHAR;
+            }
+            return Tipo_1.Tipo.STRING;
+        }
+        else if (typeof (valor) === 'number') {
+            if (this.isInt(Number(valor))) {
+                return Tipo_1.Tipo.INT;
+            }
+            return Tipo_1.Tipo.DOUBLE;
+        }
+        else if (valor === null) {
+            return Tipo_1.Tipo.NULL;
+        }
+        return Tipo_1.Tipo.VOID;
+    };
+    Asignacion.prototype.getTipoExpresion = function (ent, arbol) {
+        var valor = this.expresion.getValorImplicito(ent, arbol);
+        if (typeof (valor) === 'boolean') {
+            return Tipo_1.Tipo.BOOL;
+        }
+        else if (typeof (valor) === 'string') {
+            if (valor.length == 1) {
                 return Tipo_1.Tipo.CHAR;
             }
             return Tipo_1.Tipo.STRING;

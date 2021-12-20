@@ -28,18 +28,27 @@ export class Declaracion implements Instruccion {
         this.identificadores.forEach((id) => {
             if (!ent.existe(id)) {
                 if (this.expresion !== null) {
-                    
+
                     if (this.tipo == this.expresion.getTipo(ent, arbol)) {
                         const valor = this.expresion.getValorImplicito(ent, arbol);
                         const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
                         ent.agregar(id, simbolo);
-                    } else if (this.tipo == Tipo.DOUBLE && this.expresion.getTipo(ent, arbol)==Tipo.INT) {
+                    } else if (this.tipo == Tipo.DOUBLE && this.expresion.getTipo(ent, arbol) == Tipo.INT) {
                         const valor = this.expresion.getValorImplicito(ent, arbol);
                         valor.toFixed(1);
                         const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
                         ent.agregar(id, simbolo);
-                    }else if (this.tipo == Tipo.STRING && this.expresion.getTipo(ent, arbol)==Tipo.CHAR) {
+                    } else if (this.expresion.getTipo(ent, arbol) == Tipo.VOID) {
+                        if (this.tipo == this.getTipo(ent, arbol)) {
+                            const valor = this.expresion.getValorImplicito(ent, arbol);
+                            const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
+                            ent.agregar(id, simbolo);
+                        }else{
+                            console.error("error semantico en declaracion no se permite asignar un valor diferente al declarado en linea " + this.linea + " y columna " + this.columna);
+                        }
+                    } else if (this.tipo == Tipo.DOUBLE && this.expresion.getTipo(ent, arbol) == Tipo.INT) {
                         const valor = this.expresion.getValorImplicito(ent, arbol);
+                        valor.toFixed(1);
                         const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
                         ent.agregar(id, simbolo);
                     }
@@ -56,5 +65,34 @@ export class Declaracion implements Instruccion {
         });
     }
 
+
+    getTipo(ent: Entorno, arbol: AST): Tipo {
+        const valor = this.expresion.getValorImplicito(ent, arbol);
+
+        if (typeof (valor) === 'boolean') {
+            return Tipo.BOOL;
+        }
+        else if (typeof (valor) === 'string') {
+            if (valor.length == 1) {
+                return Tipo.CHAR;
+            }
+            return Tipo.STRING;
+        }
+        else if (typeof (valor) === 'number') {
+            if (this.isInt(Number(valor))) {
+                return Tipo.INT;
+            }
+            return Tipo.DOUBLE;
+        }
+        else if (valor === null) {
+            return Tipo.NULL;
+        }
+
+        return Tipo.VOID;
+    }
+
+    isInt(n: number) {
+        return Number(n) === n && n % 1 === 0;
+    }
 
 }
