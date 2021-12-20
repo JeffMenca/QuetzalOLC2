@@ -17,6 +17,9 @@ var Primitivo = /** @class */ (function () {
             return Tipo_1.Tipo.BOOL;
         }
         else if (typeof (valor) === 'string') {
+            if (valor.length == 1) {
+                return Tipo_1.Tipo.CHAR;
+            }
             return Tipo_1.Tipo.STRING;
         }
         else if (typeof (valor) === 'number') {
@@ -31,10 +34,17 @@ var Primitivo = /** @class */ (function () {
         return Tipo_1.Tipo.VOID;
     };
     Primitivo.prototype.getValorImplicito = function (ent, arbol) {
+        this.valor = this.removeQuotes(this.valor, ent, arbol);
         return this.valor;
     };
     Primitivo.prototype.isInt = function (n) {
         return Number(n) === n && n % 1 === 0;
+    };
+    Primitivo.prototype.removeQuotes = function (valor, ent, arbol) {
+        if (typeof (valor) === 'string' && (valor.charAt(0) == '"' || valor.charAt(0) == "'")) {
+            valor = valor.substring(1, valor.length - 1);
+        }
+        return valor;
     };
     return Primitivo;
 }());

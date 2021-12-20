@@ -40,6 +40,11 @@ var Asignacion = /** @class */ (function () {
                 simbolo.valor = valor;
                 ent.reemplazar(this.identificador, simbolo);
             }
+            else if (simbolo.getTipo(ent, arbol) == Tipo_1.Tipo.STRING && this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.CHAR) {
+                var valor = this.expresion.getValorImplicito(ent, arbol);
+                simbolo.valor = valor;
+                ent.reemplazar(this.identificador, simbolo);
+            }
             else {
                 console.error("error semantico en asignacion no se puede asignar un valor diferente al de la varianble en linea " + this.linea + " y columna " + this.columna);
             }
@@ -71,6 +76,9 @@ var Asignacion = /** @class */ (function () {
             return Tipo_1.Tipo.BOOL;
         }
         else if (typeof (valor) === 'string') {
+            if (this.isChar(valor)) {
+                return Tipo_1.Tipo.CHAR;
+            }
             return Tipo_1.Tipo.STRING;
         }
         else if (typeof (valor) === 'number') {
@@ -86,6 +94,15 @@ var Asignacion = /** @class */ (function () {
     };
     Asignacion.prototype.isInt = function (n) {
         return Number(n) === n && n % 1 === 0;
+    };
+    Asignacion.prototype.isChar = function (cadena) {
+        return cadena.length == 3 && cadena.charAt(0) === "'" && cadena.charAt(cadena.length - 1) === "'";
+    };
+    Asignacion.prototype.removeQuotes = function (valor, ent, arbol) {
+        if (typeof (valor) === 'string' && (valor.charAt(0) == '"' || valor.charAt(0) == "'")) {
+            valor = valor.substring(1, valor.length - 1);
+        }
+        return valor;
     };
     return Asignacion;
 }());

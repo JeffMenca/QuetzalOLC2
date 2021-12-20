@@ -48,7 +48,11 @@ export class Asignacion implements Instruccion {
                 valor.toFixed(1);
                 simbolo.valor = valor;
                 ent.reemplazar(this.identificador, simbolo);
-            } else {
+            } else if (simbolo.getTipo(ent, arbol)== Tipo.STRING && this.expresion.getTipo(ent, arbol)==Tipo.CHAR) {
+                const valor = this.expresion.getValorImplicito(ent, arbol);
+                simbolo.valor = valor;
+                ent.reemplazar(this.identificador, simbolo);
+            }else {
                 console.error("error semantico en asignacion no se puede asignar un valor diferente al de la varianble en linea " + this.linea + " y columna " + this.columna);
             }
         } else {
@@ -83,6 +87,9 @@ export class Asignacion implements Instruccion {
         }
         else if (typeof(valor) === 'string')
         {
+            if (this.isChar(valor)) {
+                return Tipo.CHAR;
+            }
             return Tipo.STRING;
         }
         else if (typeof(valor) === 'number')
@@ -103,4 +110,14 @@ export class Asignacion implements Instruccion {
         return Number(n) === n && n % 1 === 0;
     }
 
+    isChar(cadena: string) {
+        return cadena.length == 3 && cadena.charAt(0) === "'" && cadena.charAt(cadena.length - 1) === "'";
+    }
+
+    removeQuotes(valor: any, ent: Entorno, arbol: AST) {
+        if (typeof (valor) === 'string'  && (valor.charAt(0) == '"' || valor.charAt(0) == "'")) {
+            valor = valor.substring(1, valor.length - 1);
+        }
+        return valor;
+    }
 }

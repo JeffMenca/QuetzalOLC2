@@ -304,6 +304,33 @@ function actionGlobal(element, ent, ast) {
             }
         }
         //PRINTS Y ELEMENTOS
+    } else if (name == "Switch") {
+        const entornoSwitch = new Entorno.Entorno(ent);
+        let accionesSwitch = element.ejecutar(entornoSwitch, ast);
+        console.log(accionesSwitch);
+        if (accionesSwitch.length > 0) {
+            for (let element2 of accionesSwitch) {
+                let name2 = element2.constructor.name;
+                if (name2 == "Break") {
+                    break;
+                }
+                if (name2 == "Continue") {
+                    resultados.push(element2);
+                }
+                if (name2 !== "Print" && name2 !== "undefined") {
+                    let acciones = actionGlobal(element2, entornoSwitch, ast);
+                    acciones.forEach(function(element2) {
+                        resultados.push(element2);
+                    });
+                } else {
+                    let elementos = element2.ejecutar(entornoSwitch, ast);
+                    if (name2 === "Print") {
+                        resultados.push(elementos);
+                    }
+                }
+            }
+        }
+
     } else {
         let elementos = element.ejecutar(ent, ast);
         //PRINTS

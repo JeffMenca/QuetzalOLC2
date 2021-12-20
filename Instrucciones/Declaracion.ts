@@ -28,6 +28,7 @@ export class Declaracion implements Instruccion {
         this.identificadores.forEach((id) => {
             if (!ent.existe(id)) {
                 if (this.expresion !== null) {
+                    
                     if (this.tipo == this.expresion.getTipo(ent, arbol)) {
                         const valor = this.expresion.getValorImplicito(ent, arbol);
                         const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
@@ -35,6 +36,10 @@ export class Declaracion implements Instruccion {
                     } else if (this.tipo == Tipo.DOUBLE && this.expresion.getTipo(ent, arbol)==Tipo.INT) {
                         const valor = this.expresion.getValorImplicito(ent, arbol);
                         valor.toFixed(1);
+                        const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
+                        ent.agregar(id, simbolo);
+                    }else if (this.tipo == Tipo.STRING && this.expresion.getTipo(ent, arbol)==Tipo.CHAR) {
+                        const valor = this.expresion.getValorImplicito(ent, arbol);
                         const simbolo: Simbolo = new Simbolo(this.tipo, id, this.linea, this.columna, valor);
                         ent.agregar(id, simbolo);
                     }

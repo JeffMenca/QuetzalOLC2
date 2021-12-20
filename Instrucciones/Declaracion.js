@@ -31,6 +31,11 @@ var Declaracion = /** @class */ (function () {
                         var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, valor);
                         ent.agregar(id, simbolo);
                     }
+                    else if (_this.tipo == Tipo_1.Tipo.STRING && _this.expresion.getTipo(ent, arbol) == Tipo_1.Tipo.CHAR) {
+                        var valor = _this.expresion.getValorImplicito(ent, arbol);
+                        var simbolo = new Simbolo_1.Simbolo(_this.tipo, id, _this.linea, _this.columna, valor);
+                        ent.agregar(id, simbolo);
+                    }
                     else {
                         console.error("error semantico en declaracion no se permite asignar un valor diferente al declarado en linea " + _this.linea + " y columna " + _this.columna);
                     }

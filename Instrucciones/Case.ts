@@ -1,35 +1,44 @@
 import { AST } from "../AST/AST";
 import { Entorno } from "../AST/Entorno";
-import { Tipo } from "../AST/Tipo";
 import { Expresion } from "../Interfaces/Expresion";
+import { Instruccion } from "../Interfaces/Instruccion";
+import { Tipo } from "../AST/Tipo";
 
-export class Primitivo implements Expresion {
+export class Case implements Expresion {
     linea: number;
     columna: number;
-    valor: any;
+    public expr: Expresion;
+    public lista_instrucciones: Array<Instruccion>;
 
-    constructor(valor:any, linea:number, columna:number){
+    constructor(expr: Expresion, lista_instrucciones: Array<Instruccion>,  linea: number, columna: number) {
+        this.expr=expr;
+        this.lista_instrucciones=lista_instrucciones;
         this.linea = linea;
         this.columna = columna;
-        this.valor = valor;
     }
-    
+
     traducir(ent: Entorno, arbol: AST) {
         throw new Error("Method not implemented.");
     }
 
+
+    getValorImplicito(ent: Entorno, arbol: AST) {
+        let valor= this.expr.getValorImplicito(ent,arbol);
+       return valor;
+    }
+
+    getListaInstrucciones(ent: Entorno, arbol: AST){
+        return this.lista_instrucciones;
+    }
+
     getTipo(ent: Entorno, arbol: AST): Tipo {
         const valor = this.getValorImplicito(ent, arbol);
-        
         if (typeof(valor) === 'boolean')
         {
             return Tipo.BOOL;
         }
         else if (typeof(valor) === 'string')
         {
-            if (valor.length==1) {
-                return Tipo.CHAR;
-            }
             return Tipo.STRING;
         }
         else if (typeof(valor) === 'number')
@@ -45,20 +54,9 @@ export class Primitivo implements Expresion {
             
         return Tipo.VOID;
     }
-
-    getValorImplicito(ent: Entorno, arbol: AST) {
-        this.valor = this.removeQuotes(this.valor,ent,arbol);
-        return this.valor;
-    }
-
+    
     isInt(n:number){
         return Number(n) === n && n % 1 === 0;
     }
 
-    removeQuotes(valor: any, ent: Entorno, arbol: AST) {
-        if (typeof (valor) === 'string'  && (valor.charAt(0) == '"' || valor.charAt(0) == "'")) {
-            valor = valor.substring(1, valor.length - 1);
-        }
-        return valor;
-    }
 }

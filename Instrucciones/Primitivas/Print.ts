@@ -22,6 +22,7 @@ export class Print implements Instruccion {
     }
 
     ejecutar(ent: Entorno, arbol: AST) {
+
         const valor = this.expresion.getValorImplicito(ent, arbol);
         if (valor !== null) {
             

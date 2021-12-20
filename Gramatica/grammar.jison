@@ -46,6 +46,13 @@ BSL                                 "\\".
 "toUpperCase"         return 'mayus'
 "toLowerCase"         return 'lower'
 "in"                  return 'in'
+"parse"               return 'parse'
+"toInt"               return 'toint'
+"toDouble"            return 'todouble'
+"typeOf"              return 'typeof'
+"switch"              return 'switch'
+"case"                return 'case'
+"default"             return 'default'
 
 /* COMENTARIOS Y ESPACIOS */
 [/][*][^]*[*][/]      /* Comentario multiple */
@@ -109,7 +116,15 @@ BSL                                 "\\".
     const {Length} = require("../Instrucciones/CadenaNativas/Length.js");
     const {Mayuscula} = require("../Instrucciones/CadenaNativas/Mayuscula.js");
     const {Minuscula} = require("../Instrucciones/CadenaNativas/Minuscula.js");
+    const {Parse} = require("../Instrucciones/ExpresionNativas/Parse.js");
+    const {Toint} = require("../Instrucciones/ExpresionNativas/Toint.js");
+    const {Todouble} = require("../Instrucciones/ExpresionNativas/Todouble.js");
+    const {Tostring} = require("../Instrucciones/ExpresionNativas/Tostring.js");
+    const {Typeof} = require("../Instrucciones/ExpresionNativas/Typeof.js");
     const {If} = require("../Instrucciones/If.js");
+    const {Switch} = require("../Instrucciones/Switch.js");
+    const {Case} = require("../Instrucciones/Case.js");
+    const {Ternario} = require("../Instrucciones/Ternario.js");
     const {While} = require("../Instrucciones/While.js");
     const {Dowhile} = require("../Instrucciones/Dowhile.js");
     const {For} = require("../Instrucciones/For.js");
@@ -127,6 +142,7 @@ BSL                                 "\\".
 %}
 
 /* PRECEDENCIA */
+%right 'quest'
 %left 'or'
 %left 'and'
 %left 'dif'
@@ -170,6 +186,7 @@ INSTRUCCION:
     | BREAK semicolon        { $$ = $1; }
     | CONTINUE semicolon     { $$ = $1; }
     | INCREMENTO semicolon   { $$ = $1; }
+    | SWITCH                 { $$ = $1; }
 ;
 
 INSTRUCCIONGLOBAL:
@@ -186,8 +203,14 @@ IF:
 ;
 
 ELSE:
-    else lllave LISTA_INSTRUCCIONES rllave      {$$ = $3;}
+    else lllave LISTA_INSTRUCCIONES rllave                              {$$ = $3;}
 ;
+
+TERNARIO:
+    EXPR quest EXPR dosp EXPR                                           {$$ = new Ternario($1, $3, $5, @1.first_line, @1.first_column);} 
+;
+
+
 
 WHILE:
     while lparen EXPR rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new While($3, $6, @1.first_line, @1.first_column); } 
@@ -244,11 +267,39 @@ LISTA_ID: LISTA_ID coma identifier      { $1.push($3); $$ = $1; }
         | identifier                    { $$ = [$1]; } 
 ;
 
+NATIVAS:
+    TIPO dot parse lparen EXPR rparen   {$$ = new Parse($1,$5,@1.first_line, @1.first_column);}
+    | toint lparen EXPR rparen          {$$ = new Toint($3,@1.first_line, @1.first_column);}
+    | todouble lparen EXPR rparen       {$$ = new Todouble($3,@1.first_line, @1.first_column);}
+    | string lparen EXPR rparen         {$$ = new Tostring($3,@1.first_line, @1.first_column);}
+    | typeof lparen EXPR rparen         {$$ = new Typeof($3,@1.first_line, @1.first_column);}
+;
+
+SWITCH:
+    switch lparen EXPR rparen lllave CASES rllave           { $$ = new Switch($3,$6,null,@1.first_line, @1.first_column); }
+    | switch lparen EXPR rparen lllave CASES DEFAULT rllave { $$ = new Switch($3,$6,$7,@1.first_line, @1.first_column); }
+    | switch lparen EXPR rparen lllave DEFAULT rllave       { $$ = new Switch($3,null,$7,@1.first_line, @1.first_column); }
+;
+
+CASES:
+    CASES CASE { $1.push($2); $$ = $1;}
+    | CASE {$$ = [$1]; }
+;
+
+CASE: 
+    case EXPR dosp LISTA_INSTRUCCIONES { $$ = new Case($2,$4,@1.first_line, @1.first_column); }
+;
+
+DEFAULT:
+    default dosp LISTA_INSTRUCCIONES { $$ = new Case($1,$3,@1.first_line, @1.first_column); }
+;
+
 TIPO:
     int                 { $$ = Tipo.INT; }
     | double            { $$  = Tipo.DOUBLE; }
     | boolean           { $$  = Tipo.BOOL; }
     | string            { $$  = Tipo.STRING; }
+    | char              { $$  = Tipo.CHAR; }
 ;
 
 EXPR:
@@ -259,8 +310,9 @@ EXPR:
     | OP_LOGICAS                        { $$ = $1 }
     | INCREMENTO                        { $$ = $1 }
     | CADENAS                           { $$ = $1 }
+    | TERNARIO                          { $$ = $1 }
+    | NATIVAS                           { $$ = $1 }
 ;
-
 
 OP_ARITMETICAS:
     EXPR plus EXPR                      { $$ = new Operacion($1,$3,Operador.SUMA, @1.first_line, @1.first_column); }
@@ -295,7 +347,7 @@ PRIMITIVA:
     IntegerLiteral                      { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
     | DoubleLiteral                     { $$ = new Primitivo(Number($1), @1.first_line, @1.first_column); }
     | StringLiteral                     { $$ = new Primitivo($1.replace(/['"]+/g, ''), @1.first_line, @1.first_column); }
-    | charliteral                       { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
+    | CharLiteral                       { $$ = new Primitivo($1, @1.first_line, @1.first_column); }
     | null                              { $$ = new Primitivo(null, @1.first_line, @1.first_column); }
     | true                              { $$ = new Primitivo(true, @1.first_line, @1.first_column); }
     | false                             { $$ = new Primitivo(false, @1.first_line, @1.first_column); } 

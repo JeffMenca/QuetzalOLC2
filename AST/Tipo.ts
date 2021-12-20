@@ -7,5 +7,6 @@ export enum Tipo {
     STRUCT,
     NULL,
     ATRIBUTO,
+    CHAR,
     ARRAY
 }
