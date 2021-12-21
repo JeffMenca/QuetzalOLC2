@@ -13,7 +13,11 @@ var Print = /** @class */ (function () {
         throw new Error("Method not implemented.");
     };
     Print.prototype.ejecutar = function (ent, arbol) {
-        var valor = this.expresion.getValorImplicito(ent, arbol);
+        var valor = "";
+        for (var _i = 0, _a = this.expresion; _i < _a.length; _i++) {
+            var dato = _a[_i];
+            valor = valor + dato.getValorImplicito(ent, arbol);
+        }
         if (valor !== null) {
             if (this.saltoLinea) {
                 return valor + "\n";

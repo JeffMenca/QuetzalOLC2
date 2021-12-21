@@ -267,11 +267,18 @@ INCREMENTO:
 
 DECLARACION:
         TIPO LISTA_ID                   { $$ = new Declaracion($2, $1, @1.first_line, @1.first_column); } 
-    | TIPO identifier asign EXPR        { $$ = new Declaracion([$2],$1, @1.first_line, @1.first_column,$4); } ;
+    | TIPO identifier asign EXPR        { $$ = new Declaracion([$2],$1, @1.first_line, @1.first_column,$4); } 
+;
 
 PRINT:
-    print lparen EXPR rparen            { $$ = new Print($3, @1.first_line, @1.first_column); } 
-    | println lparen EXPR rparen        { $$ = new Print($3, @1.first_line, @1.first_column,true); } ;
+    print lparen EXPRS rparen            { $$ = new Print($3, @1.first_line, @1.first_column); } 
+    | println lparen EXPRS rparen        { $$ = new Print($3, @1.first_line, @1.first_column,true); }
+;
+
+EXPRS:
+    EXPRS coma EXPR    { $1.push($3); $$ = $1;} 
+    | EXPR             { $$ = [$1]; }
+;
 
 LISTA_ID: LISTA_ID coma identifier      { $1.push($3); $$ = $1; } 
         | identifier                    { $$ = [$1]; } 

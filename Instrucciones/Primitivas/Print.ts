@@ -7,10 +7,10 @@ import { Instruccion } from "../../Interfaces/Instruccion";
 export class Print implements Instruccion {
     linea: number;
     columna: number;
-    public expresion: Expresion;
+    public expresion: Array<Expresion>;
     saltoLinea: boolean;
 
-    constructor(exp: Expresion, linea: number, columna: number, saltoLinea: boolean=false) {
+    constructor(exp: Array<Expresion>, linea: number, columna: number, saltoLinea: boolean=false) {
         this.expresion = exp;
         this.linea = linea;
         this.columna = columna;
@@ -22,8 +22,10 @@ export class Print implements Instruccion {
     }
 
     ejecutar(ent: Entorno, arbol: AST) {
-
-        const valor = this.expresion.getValorImplicito(ent, arbol);
+        let valor="";
+        for (let dato of this.expresion) {
+            valor=valor +dato.getValorImplicito(ent, arbol);
+        }
         if (valor !== null) {
             
             if (this.saltoLinea) {

@@ -62,20 +62,40 @@ function actionGlobal(element, ent, ast) {
                 let elementos = element2.ejecutar(entornoMain, ast);
 
                 if (element2.expresion != null) {
-                    if (element2.expresion.getTipo(ent, ast) == 4) {
-                        let entornoSecundario = element2.entornoFuncion;
-                        let accionesVoid = element2.expresion.ejecutar(entornoSecundario, ast);
-                        for (let element3 of accionesVoid) {
-                            let accionesSecundarias = actionGlobal(element3, ent, ast);
-                            accionesSecundarias.forEach(function(element4) {
+                    if (name2 == "Print") {
+                        for (let dato of element2.expresion) {
+                            if (dato.getTipo(ent, ast) == 4) {
+                                let entornoSecundario = element2.entornoFuncion;
+                                let accionesVoid = dato.ejecutar(entornoSecundario, ast);
+                                for (let element3 of accionesVoid) {
+                                    let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                    accionesSecundarias.forEach(function(element4) {
 
-                                if (element4.constructor.name != "Return") {
-                                    resultados.push(element4);
+                                        if (element4.constructor.name != "Return") {
+                                            resultados.push(element4);
+                                        }
+
+                                    });
                                 }
+                            }
+                        }
+                    } else {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let entornoSecundario = element2.entornoFuncion;
+                            let accionesVoid = element2.expresion.ejecutar(entornoSecundario, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
 
-                            });
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
+
+                                });
+                            }
                         }
                     }
+
                 }
 
                 if (name2 === "Print") {
@@ -531,7 +551,7 @@ function actionGlobal(element, ent, ast) {
         //PRINTS Y ELEMENTOS
     } else {
         let elementos = element.ejecutar(ent, ast);
-        if (name != "Funcion") {
+        if (name != "Funcion" && name != "Print") {
             if (element.expresion != null) {
                 if (element.expresion.getTipo(ent, ast) == 4) {
                     let accionesVoid = element.expresion.ejecutar(ent, ast);
