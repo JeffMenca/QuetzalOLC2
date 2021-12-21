@@ -25,9 +25,6 @@ var AccesoFuncion = /** @class */ (function () {
             instrucciones = funcion.obtenerInstrucciones(ent, arbol);
             this.entornoFuncion = funcion.entornoFuncion;
             parametros = funcion.parametros;
-            if (funcion.retorno != null) {
-                this.retorno = funcion.retorno;
-            }
             if (this.parametros.length == parametros.length) {
                 for (var i = 0; i < this.parametros.length; i++) {
                     var id = parametros[i].identificadores[0];
@@ -39,6 +36,9 @@ var AccesoFuncion = /** @class */ (function () {
                 console.log("Error, faltan parametros en la funcion " + this.nombre + " en la linea " + this.linea + " y columna " + this.columna);
                 instrucciones = null;
             }
+            if (funcion.retorno != null) {
+                this.retorno = funcion.retorno;
+            }
         }
         else {
             console.log("Error, no existe la funcion " + this.nombre + " en la linea " + this.linea + " y columna " + this.columna);
@@ -48,8 +48,15 @@ var AccesoFuncion = /** @class */ (function () {
     };
     AccesoFuncion.prototype.getValorImplicito = function (ent, arbol) {
         this.ejecutar(ent, arbol);
-        var retorno2 = this.retorno.getValorImplicito(ent, arbol);
-        return retorno2;
+        var funcion = arbol.getFuncion(this.nombre);
+        if (funcion != null) {
+            if (funcion.retorno != null) {
+                var retorno2 = this.retorno.getValorImplicito(ent, arbol);
+                return retorno2;
+            }
+        }
+        return null;
+        ;
     };
     AccesoFuncion.prototype.getTipo = function (ent, arbol) {
         return Tipo_1.Tipo.VOID;

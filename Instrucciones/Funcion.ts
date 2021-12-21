@@ -8,7 +8,7 @@ import { Tipo } from "../AST/Tipo";
 export class Funcion implements Instruccion {
     nombre: string;
     public parametros: Array<Declaracion>;
-    lista_instrucciones_funcion: Array<Instruccion>;
+    public lista_instrucciones_funcion: Array<Instruccion>;
     tipo: Tipo;
     linea: number;
     columna: number;    
@@ -32,7 +32,7 @@ export class Funcion implements Instruccion {
     ejecutar(ent: Entorno, arbol: AST) {
         this.entornoFuncion = new Entorno(ent);
         this.parametros.forEach((element) => {
-            element.ejecutar(this.entornoFuncion, arbol);
+            element.ejecutar(ent, arbol);
         });
         arbol.addFuncion(this);
     }

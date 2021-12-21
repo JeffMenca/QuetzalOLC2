@@ -5,13 +5,13 @@ let Instruccion = require("../Interfaces/Instruccion.js")
 let Print = require("../Instrucciones/Primitivas/Print.js")
 let Primitivo = require("../Expresiones/Primitivo.js")
 let Tipo = require("../AST/Tipo.js");
-let acciones = [];
 
 if (typeof window !== 'undefined') {
     window.parseGrammar = function(input) {
         const instrucciones = grammar.parse(input);
         const ast = new AST.AST(instrucciones);
         const entornoGlobal = new Entorno.Entorno(null);
+        let acciones = [];
         let banderaMain = 0;
         let main;
         //Se realizan acciones de lo global
@@ -60,17 +60,24 @@ function actionGlobal(element, ent, ast) {
                 }
             } else {
                 let elementos = element2.ejecutar(entornoMain, ast);
+
                 if (element2.expresion != null) {
                     if (element2.expresion.getTipo(ent, ast) == 4) {
-                        let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                        let entornoSecundario = element2.entornoFuncion;
+                        let accionesVoid = element2.expresion.ejecutar(entornoSecundario, ast);
                         for (let element3 of accionesVoid) {
                             let accionesSecundarias = actionGlobal(element3, ent, ast);
                             accionesSecundarias.forEach(function(element4) {
-                                resultados.push(element4);
+
+                                if (element4.constructor.name != "Return") {
+                                    resultados.push(element4);
+                                }
+
                             });
                         }
                     }
                 }
+
                 if (name2 === "Print") {
                     resultados.push(elementos);
                 }
@@ -84,6 +91,9 @@ function actionGlobal(element, ent, ast) {
             let accionesWhile = element.ejecutar(entornoWhile, ast);
             for (let element2 of accionesWhile) {
                 let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    resultados.push(element2);
+                }
                 if (name2 == "Break") {
                     bandera = true;
                     break;
@@ -110,6 +120,19 @@ function actionGlobal(element, ent, ast) {
                     }
                 } else {
                     let elementos = element2.ejecutar(entornoWhile, ast);
+                    if (element2.expresion != null) {
+                        if (element2.expresion.getTipo(ent, ast) == 4) {
+                            let accionesVoid = element2.expresion.ejecutar(ent, ast);
+                            for (let element3 of accionesVoid) {
+                                let accionesSecundarias = actionGlobal(element3, ent, ast);
+                                accionesSecundarias.forEach(function(element4) {
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
+                                });
+                            }
+                        }
+                    }
                     if (name2 === "Print") {
                         resultados.push(elementos);
                     }
@@ -128,13 +151,12 @@ function actionGlobal(element, ent, ast) {
     } else if (name == "If") {
         const entornoIf = new Entorno.Entorno(ent);
         let accionesIf = element.ejecutar(entornoIf, ast);
-        if (element.condicion.getValorImplicito(entornoIf, ast)) {
+        if (element.condicion.getValorImplicito(ent, ast)) {
             accionesIf.forEach(function(element2) {
                 let name2 = element2.constructor.name;
-                if (name2 == "Break" || name2 == "Continue") {
+                if (name2 == "Break" || name2 == "Continue" || name2 == "Return") {
                     resultados.push(element2);
-                }
-                if (name2 !== "Print" && name2 !== "undefined") {
+                } else if (name2 !== "Print" && name2 !== "undefined") {
                     let acciones = actionGlobal(element2, entornoIf, ast);
                     acciones.forEach(function(element2) {
                         resultados.push(element2);
@@ -147,7 +169,9 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
@@ -163,7 +187,7 @@ function actionGlobal(element, ent, ast) {
             if (accionesElse != undefined) {
                 accionesElse.forEach(function(element2) {
                     let name2 = element2.constructor.name;
-                    if (name2 == "Break" || name2 == "Continue") {
+                    if (name2 == "Break" || name2 == "Continue" || name2 == "Return") {
                         resultados.push(element2);
                     } else if (name2 !== "Print" && name2 !== "undefined") {
                         let acciones = actionGlobal(element2, entornoElse, ast);
@@ -178,7 +202,9 @@ function actionGlobal(element, ent, ast) {
                                 for (let element3 of accionesVoid) {
                                     let accionesSecundarias = actionGlobal(element3, ent, ast);
                                     accionesSecundarias.forEach(function(element4) {
-                                        resultados.push(element4);
+                                        if (element4.constructor.name != "Return") {
+                                            resultados.push(element4);
+                                        }
                                     });
                                 }
                             }
@@ -197,6 +223,9 @@ function actionGlobal(element, ent, ast) {
             let accionesDowhile = element.ejecutar(entornoDowhile, ast);
             for (let element2 of accionesDowhile) {
                 let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    resultados.push(element2);
+                }
                 if (name2 == "Break") {
                     bandera = true;
                     break;
@@ -229,7 +258,9 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
@@ -259,6 +290,9 @@ function actionGlobal(element, ent, ast) {
             let accionesFor = element.ejecutar(entornoForAcciones, ast);
             for (let element2 of accionesFor) {
                 let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    resultados.push(element2);
+                }
                 if (name2 == "Break") {
                     bandera = true;
                     break;
@@ -291,7 +325,9 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
@@ -330,6 +366,9 @@ function actionGlobal(element, ent, ast) {
             let accionesForin = element.ejecutar(entornoForinAcciones, ast);
             for (let element2 of accionesForin) {
                 let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    resultados.push(element2);
+                }
                 if (name2 == "Break") {
                     bandera = true;
                     break;
@@ -362,7 +401,9 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
@@ -389,6 +430,9 @@ function actionGlobal(element, ent, ast) {
         if (accionesSwitch.length > 0) {
             for (let element2 of accionesSwitch) {
                 let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    resultados.push(element2);
+                }
                 if (name2 == "Break") {
                     break;
                 }
@@ -408,7 +452,9 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name != "Return") {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
@@ -439,13 +485,45 @@ function actionGlobal(element, ent, ast) {
                             for (let element3 of accionesVoid) {
                                 let accionesSecundarias = actionGlobal(element3, ent, ast);
                                 accionesSecundarias.forEach(function(element4) {
-                                    resultados.push(element4);
+                                    if (element4.constructor.name == "Return") {
+                                        if (element4.expresion != null) {
+                                            element.retorno = element4.expresion;
+                                        }
+                                    } else {
+                                        resultados.push(element4);
+                                    }
                                 });
                             }
                         }
                     }
+
                     if (name2 === "Print") {
                         resultados.push(elementos);
+                    }
+                }
+            }
+        }
+        //FUNCION
+    } else if (name == "Funcion") {
+        element.ejecutar(ent, ast);
+        let entornoFuncion = element.entornoFuncion;
+        let accionesFuncion = element.lista_instrucciones_funcion;
+        if (accionesFuncion != null) {
+            for (let element2 of accionesFuncion) {
+                let name2 = element2.constructor.name;
+                if (name2 == "Return") {
+                    element.retorno = element2.expresion;
+                    break;
+                }
+                if (name2 !== "Print" && name2 !== "undefined") {
+                    let acciones = actionGlobal(element2, ent, ast);
+                    for (let element3 of acciones) {
+                        if (element3.constructor.name == "Return") {
+                            if (element3.expresion != null) {
+                                element.retorno = element3.expresion;
+                                break;
+                            }
+                        }
                     }
                 }
             }

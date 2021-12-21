@@ -18,10 +18,9 @@ var Funcion = /** @class */ (function () {
         throw new Error("Method not implemented.");
     };
     Funcion.prototype.ejecutar = function (ent, arbol) {
-        var _this = this;
         this.entornoFuncion = new Entorno_1.Entorno(ent);
         this.parametros.forEach(function (element) {
-            element.ejecutar(_this.entornoFuncion, arbol);
+            element.ejecutar(ent, arbol);
         });
         arbol.addFuncion(this);
     };

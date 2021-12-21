@@ -14,12 +14,12 @@ export class AccesoFuncion implements Expresion {
     public entornoFuncion = new Entorno(null);
     public retorno: Expresion;
 
-    constructor(nombre: string, parametros: Array<Expresion>, linea: number, columna: number,retorno: any = null) {
+    constructor(nombre: string, parametros: Array<Expresion>, linea: number, columna: number, retorno: any = null) {
         this.nombre = nombre;
         this.parametros = parametros;
         this.linea = linea;
         this.columna = columna;
-        this.retorno=retorno;
+        this.retorno = retorno;
     }
 
     traducir(ent: Entorno, arbol: AST) {
@@ -34,9 +34,6 @@ export class AccesoFuncion implements Expresion {
             instrucciones = funcion.obtenerInstrucciones(ent, arbol);
             this.entornoFuncion = funcion.entornoFuncion;
             parametros = funcion.parametros;
-            if (funcion.retorno != null) {
-                this.retorno = funcion.retorno;
-            }
             if (this.parametros.length == parametros.length) {
                 for (let i = 0; i < this.parametros.length; i++) {
                     let id = parametros[i].identificadores[0];
@@ -47,20 +44,30 @@ export class AccesoFuncion implements Expresion {
                 console.log("Error, faltan parametros en la funcion " + this.nombre + " en la linea " + this.linea + " y columna " + this.columna);
                 instrucciones = null;
             }
+            if (funcion.retorno != null) {
+                this.retorno = funcion.retorno;
+            }
         } else {
             console.log("Error, no existe la funcion " + this.nombre + " en la linea " + this.linea + " y columna " + this.columna);
             instrucciones = null;
         }
+        
         return instrucciones;
     }
 
     getValorImplicito(ent: Entorno, arbol: AST) {
-        this.ejecutar(ent,arbol);
-        let retorno2=this.retorno.getValorImplicito(ent,arbol);
-        return retorno2;
+        this.ejecutar(ent, arbol);
+        let funcion = arbol.getFuncion(this.nombre);
+        if (funcion != null) {
+            if (funcion.retorno != null) {
+                let retorno2 = this.retorno.getValorImplicito(ent, arbol);
+                return retorno2;
+            }
+        }
+        return null;;
     }
 
-    getTipo(ent: Entorno, arbol: AST): Tipo { 
+    getTipo(ent: Entorno, arbol: AST): Tipo {
         return Tipo.VOID;
     }
 }

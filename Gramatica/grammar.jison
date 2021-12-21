@@ -131,6 +131,7 @@ BSL                                 "\\".
     const {Dowhile} = require("../Instrucciones/Dowhile.js");
     const {For} = require("../Instrucciones/For.js");
     const {Break} = require("../Instrucciones/Break.js");
+    const {Return} = require("../Instrucciones/Return.js");
     const {Continue} = require("../Instrucciones/Continue.js");
     const {Declaracion} = require("../Instrucciones/Declaracion.js");
     const {Asignacion} = require("../Instrucciones/Asignacion.js");
@@ -189,6 +190,7 @@ INSTRUCCION:
     | FOR                     { $$ = $1; }
     | BREAK semicolon         { $$ = $1; }
     | CONTINUE semicolon      { $$ = $1; }
+    | RETURN semicolon        { $$ = $1; }
     | INCREMENTO semicolon    { $$ = $1; }
     | SWITCH                  { $$ = $1; }
     | ACCESOFUNCION semicolon { $$ = $1; }
@@ -238,6 +240,10 @@ BREAK:
 
 CONTINUE:
     continue                            { $$ = new Continue( @1.first_line, @1.first_column); }     
+;
+
+RETURN:
+    return EXPR                         { $$ = new Return($2, @1.first_line, @1.first_column); } 
 ;
 
 CADENAS:
@@ -301,8 +307,8 @@ DEFAULT:
 FUNCION:
     void identifier lparen rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new Funcion($2, [],$6,Tipo.VOID, @1.first_line, @1.first_column); } 
     | void identifier lparen LISTA_PARAMETROS rparen lllave LISTA_INSTRUCCIONES rllave { $$ = new Funcion($2, $4,$7,Tipo.VOID, @1.first_line, @1.first_column); } 
-    | TIPO identifier lparen LISTA_PARAMETROS rparen lllave LISTA_INSTRUCCIONES return EXPR semicolon rllave { $$ = new Funcion($2, $4,$7,$1, @1.first_line, @1.first_column,$9); } 
-    | TIPO identifier lparen rparen lllave LISTA_INSTRUCCIONES return EXPR semicolon rllave { $$ = new Funcion($2, [],$6,$1, @1.first_line, @1.first_column,$8); } 
+    | TIPO identifier lparen LISTA_PARAMETROS rparen lllave LISTA_INSTRUCCIONES  rllave { $$ = new Funcion($2, $4,$7,$1, @1.first_line, @1.first_column); } 
+    | TIPO identifier lparen rparen lllave LISTA_INSTRUCCIONES  rllave { $$ = new Funcion($2, [],$6,$1, @1.first_line, @1.first_column); } 
 ;
 
 LISTA_PARAMETROS: LISTA_PARAMETROS coma PARAMETRO    { $1.push($3); $$ = $1; } 
